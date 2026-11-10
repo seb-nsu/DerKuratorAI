@@ -1,0 +1,24 @@
+# Internal hosting template: one container, data on a named volume, secrets from .env (never committed).
+# FRONTEND=nicegui | react | streamlit (all three listen on HOST:PORT inside the container).
+# One server process by default. React may run several workers in this container (WEB_CONCURRENCY: "4" plus
+# STATE_STORE: file and API_TOKEN_SECRET in .env): runs, sign-outs and calculation counters are then shared through
+# data/state/api on the volume (see docs/API.md, "Limits"). NiceGUI and Streamlit stay in one process; several
+# replicas of them need sticky sessions at the load balancer (docs/PILOT_OPERATIONS.md, "Several users at once").
+services:
+  derkurator:
+    build: .
+    image: derkurator:latest
+    env_file: .env
+    environment:
+      FRONTEND: ${FRONTEND:-streamlit}
+      HOST: 0.0.0.0
+      PORT: "8080"
+      # STATE_STORE: file      # with WEB_CONCURRENCY above 1 or replicas on this volume
+      # WEB_CONCURRENCY: "4"   # React only
+    ports:
+      - "127.0.0.1:8080:8080"  # behind the company reverse proxy (TLS, SSO later); never exposed directly
+    volumes:
+      - derkurator-data:/app/data
+    restart: unless-stopped
+volumes:
+  derkurator-data:

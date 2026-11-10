@@ -1,0 +1,689 @@
+{
+ "_note": "Table API responses (sysparm_display_value=all, sysparm_exclude_reference_link=true) of the SPM tables, one record list per table, in the documented response format; anonymised test data.",
+ "pm_project": [
+  {
+   "sys_id": {
+    "value": "p0000000000000000000000000000001",
+    "display_value": "p0000000000000000000000000000001"
+   },
+   "sys_updated_on": {
+    "value": "2026-09-01 08:00:00",
+    "display_value": "01.09.2026 10:00:00"
+   },
+   "number": {
+    "value": "PRJ0010001",
+    "display_value": "PRJ0010001"
+   },
+   "short_description": {
+    "value": "General Ledger Consolidation",
+    "display_value": "General Ledger Consolidation"
+   },
+   "project_manager": {
+    "value": "u0000000000000000000000000000001",
+    "display_value": "Priya Raman"
+   },
+   "overall_health": {
+    "value": "red",
+    "display_value": "Red"
+   },
+   "state": {
+    "value": "2",
+    "display_value": "Work in Progress"
+   },
+   "phase": {
+    "value": "execution",
+    "display_value": "Executing"
+   },
+   "percent_complete": {
+    "value": "30",
+    "display_value": "30"
+   },
+   "start_date": {
+    "value": "2026-01-05",
+    "display_value": "05.01.2026"
+   },
+   "work_start": {
+    "value": "2026-01-12",
+    "display_value": "12.01.2026"
+   },
+   "end_date": {
+    "value": "2027-03-31",
+    "display_value": "31.03.2027"
+   },
+   "execution_type": {
+    "value": "waterfall",
+    "display_value": "Waterfall"
+   },
+   "priority": {
+    "value": "1",
+    "display_value": "1 - High"
+   },
+   "primary_portfolio": {
+    "value": "f0000000000000000000000000000001",
+    "display_value": "Finance Transformation"
+   },
+   "business_unit": {
+    "value": "b0000000000000000000000000000001",
+    "display_value": "Shared Services"
+   },
+   "cost": {
+    "value": "1200000.00",
+    "display_value": "€1200000.00"
+   },
+   "capex_cost": {
+    "value": "720000.0",
+    "display_value": "720000.0"
+   },
+   "opex_cost": {
+    "value": "480000.0",
+    "display_value": "480000.0"
+   },
+   "budget_cost": {
+    "value": "1200000.00",
+    "display_value": "€1200000.00"
+   },
+   "work_cost": {
+    "value": "640000.00",
+    "display_value": "€640000.00"
+   },
+   "estimate_at_completion": {
+    "value": "1310000.00",
+    "display_value": "€1310000.00"
+   },
+   "npv_value": {
+    "value": "250000.00",
+    "display_value": "250000.00"
+   },
+   "sponsor": {
+    "value": "x0000000000000000000000000000001",
+    "display_value": "Eva Lindgren"
+   },
+   "business_case": {
+    "value": "Reduce closing time and audit findings",
+    "display_value": "Reduce closing time and audit findings"
+   },
+   "planned_benefit": {
+    "value": "900000.00",
+    "display_value": "€900,000.00"
+   }
+  },
+  {
+   "sys_id": {
+    "value": "p0000000000000000000000000000002",
+    "display_value": "p0000000000000000000000000000002"
+   },
+   "sys_updated_on": {
+    "value": "2026-09-01 08:00:00",
+    "display_value": "01.09.2026 10:00:00"
+   },
+   "number": {
+    "value": "PRJ0010002",
+    "display_value": "PRJ0010002"
+   },
+   "short_description": {
+    "value": "Customer Portal Relaunch",
+    "display_value": "Customer Portal Relaunch"
+   },
+   "project_manager": {
+    "value": "u0000000000000000000000000000002",
+    "display_value": "Rowan Ellis"
+   },
+   "overall_health": {
+    "value": "yellow",
+    "display_value": "Yellow"
+   },
+   "state": {
+    "value": "2",
+    "display_value": "Work in Progress"
+   },
+   "phase": {
+    "value": "execution",
+    "display_value": "Executing"
+   },
+   "percent_complete": {
+    "value": "60",
+    "display_value": "60"
+   },
+   "start_date": {
+    "value": "2026-01-05",
+    "display_value": "05.01.2026"
+   },
+   "work_start": {
+    "value": "2026-01-12",
+    "display_value": "12.01.2026"
+   },
+   "end_date": {
+    "value": "2027-03-31",
+    "display_value": "31.03.2027"
+   },
+   "execution_type": {
+    "value": "waterfall",
+    "display_value": "Waterfall"
+   },
+   "priority": {
+    "value": "2",
+    "display_value": "2 - High"
+   },
+   "primary_portfolio": {
+    "value": "f0000000000000000000000000000002",
+    "display_value": "Finance Transformation"
+   },
+   "business_unit": {
+    "value": "b0000000000000000000000000000002",
+    "display_value": "Shared Services"
+   },
+   "cost": {
+    "value": "800000.00",
+    "display_value": "€800000.00"
+   },
+   "capex_cost": {
+    "value": "480000.0",
+    "display_value": "480000.0"
+   },
+   "opex_cost": {
+    "value": "320000.0",
+    "display_value": "320000.0"
+   },
+   "budget_cost": {
+    "value": "800000.00",
+    "display_value": "€800000.00"
+   },
+   "work_cost": {
+    "value": "300000.00",
+    "display_value": "€300000.00"
+   },
+   "estimate_at_completion": {
+    "value": "820000.00",
+    "display_value": "€820000.00"
+   },
+   "npv_value": {
+    "value": "250000.00",
+    "display_value": "250000.00"
+   },
+   "sponsor": {
+    "value": "x0000000000000000000000000000002",
+    "display_value": "Eva Lindgren"
+   },
+   "business_case": {
+    "value": "Reduce closing time and audit findings",
+    "display_value": "Reduce closing time and audit findings"
+   },
+   "planned_benefit": {
+    "value": "900000.00",
+    "display_value": "€900,000.00"
+   }
+  },
+  {
+   "sys_id": {
+    "value": "p0000000000000000000000000000003",
+    "display_value": "p0000000000000000000000000000003"
+   },
+   "sys_updated_on": {
+    "value": "2026-09-01 08:00:00",
+    "display_value": "01.09.2026 10:00:00"
+   },
+   "number": {
+    "value": "PRJ0010003",
+    "display_value": "PRJ0010003"
+   },
+   "short_description": {
+    "value": "Data Platform",
+    "display_value": "Data Platform"
+   },
+   "project_manager": {
+    "value": "u0000000000000000000000000000003",
+    "display_value": "Sam Lee"
+   },
+   "overall_health": {
+    "value": "green",
+    "display_value": "Green"
+   },
+   "state": {
+    "value": "1",
+    "display_value": "Open"
+   },
+   "phase": {
+    "value": "execution",
+    "display_value": "Executing"
+   },
+   "percent_complete": {
+    "value": "90",
+    "display_value": "90"
+   },
+   "start_date": {
+    "value": "2026-01-05",
+    "display_value": "05.01.2026"
+   },
+   "work_start": {
+    "value": "2026-01-12",
+    "display_value": "12.01.2026"
+   },
+   "end_date": {
+    "value": "2027-03-31",
+    "display_value": "31.03.2027"
+   },
+   "execution_type": {
+    "value": "waterfall",
+    "display_value": "Waterfall"
+   },
+   "priority": {
+    "value": "3",
+    "display_value": "3 - High"
+   },
+   "primary_portfolio": {
+    "value": "f0000000000000000000000000000003",
+    "display_value": "Finance Transformation"
+   },
+   "business_unit": {
+    "value": "b0000000000000000000000000000003",
+    "display_value": "Shared Services"
+   },
+   "cost": {
+    "value": "500000.00",
+    "display_value": "€500000.00"
+   },
+   "capex_cost": {
+    "value": "300000.0",
+    "display_value": "300000.0"
+   },
+   "opex_cost": {
+    "value": "200000.0",
+    "display_value": "200000.0"
+   },
+   "budget_cost": {
+    "value": "500000.00",
+    "display_value": "€500000.00"
+   },
+   "work_cost": {
+    "value": "0.00",
+    "display_value": "€0.00"
+   },
+   "estimate_at_completion": {
+    "value": "500000.00",
+    "display_value": "€500000.00"
+   },
+   "npv_value": {
+    "value": "250000.00",
+    "display_value": "250000.00"
+   },
+   "sponsor": {
+    "value": "x0000000000000000000000000000003",
+    "display_value": "Eva Lindgren"
+   },
+   "business_case": {
+    "value": "Reduce closing time and audit findings",
+    "display_value": "Reduce closing time and audit findings"
+   },
+   "planned_benefit": {
+    "value": "900000.00",
+    "display_value": "€900,000.00"
+   }
+  }
+ ],
+ "pm_project_task": [
+  {
+   "sys_id": {
+    "value": "t0000000000000000000000000000001",
+    "display_value": "t0000000000000000000000000000001"
+   },
+   "sys_updated_on": {
+    "value": "2026-09-01 08:00:00",
+    "display_value": "2026-09-01 08:00:00"
+   },
+   "number": {
+    "value": "PRJTASK0001",
+    "display_value": "PRJTASK0001"
+   },
+   "top_task": {
+    "value": "p0000000000000000000000000000001",
+    "display_value": "PRJ0010001"
+   },
+   "short_description": {
+    "value": "Task 1",
+    "display_value": "Task 1"
+   },
+   "start_date": {
+    "value": "2026-02-01",
+    "display_value": "2026-02-01"
+   },
+   "end_date": {
+    "value": "2026-06-30",
+    "display_value": "2026-06-30"
+   },
+   "assigned_to": {
+    "value": "u0000000000000000000000000000001",
+    "display_value": "Ruben Costa"
+   },
+   "assignment_group": {
+    "value": "g0000000000000000000000000000001",
+    "display_value": "Team Orion"
+   },
+   "state": {
+    "value": "2",
+    "display_value": "Work in Progress"
+   },
+   "percent_complete": {
+    "value": "50",
+    "display_value": "50"
+   }
+  },
+  {
+   "sys_id": {
+    "value": "t0000000000000000000000000000002",
+    "display_value": "t0000000000000000000000000000002"
+   },
+   "sys_updated_on": {
+    "value": "2026-09-01 08:00:00",
+    "display_value": "2026-09-01 08:00:00"
+   },
+   "number": {
+    "value": "PRJTASK0002",
+    "display_value": "PRJTASK0002"
+   },
+   "top_task": {
+    "value": "p0000000000000000000000000000002",
+    "display_value": "PRJ0010002"
+   },
+   "short_description": {
+    "value": "Task 2",
+    "display_value": "Task 2"
+   },
+   "start_date": {
+    "value": "2026-02-01",
+    "display_value": "2026-02-01"
+   },
+   "end_date": {
+    "value": "2026-06-30",
+    "display_value": "2026-06-30"
+   },
+   "assigned_to": {
+    "value": "u0000000000000000000000000000002",
+    "display_value": "Ruben Costa"
+   },
+   "assignment_group": {
+    "value": "g0000000000000000000000000000002",
+    "display_value": "Team Orion"
+   },
+   "state": {
+    "value": "2",
+    "display_value": "Work in Progress"
+   },
+   "percent_complete": {
+    "value": "50",
+    "display_value": "50"
+   }
+  },
+  {
+   "sys_id": {
+    "value": "t0000000000000000000000000000003",
+    "display_value": "t0000000000000000000000000000003"
+   },
+   "sys_updated_on": {
+    "value": "2026-09-01 08:00:00",
+    "display_value": "2026-09-01 08:00:00"
+   },
+   "number": {
+    "value": "PRJTASK0003",
+    "display_value": "PRJTASK0003"
+   },
+   "top_task": {
+    "value": "p0000000000000000000000000000003",
+    "display_value": "PRJ0010003"
+   },
+   "short_description": {
+    "value": "Task 3",
+    "display_value": "Task 3"
+   },
+   "start_date": {
+    "value": "2026-02-01",
+    "display_value": "2026-02-01"
+   },
+   "end_date": {
+    "value": "2026-06-30",
+    "display_value": "2026-06-30"
+   },
+   "assigned_to": {
+    "value": "u0000000000000000000000000000003",
+    "display_value": "Ruben Costa"
+   },
+   "assignment_group": {
+    "value": "g0000000000000000000000000000003",
+    "display_value": "Team Orion"
+   },
+   "state": {
+    "value": "2",
+    "display_value": "Work in Progress"
+   },
+   "percent_complete": {
+    "value": "50",
+    "display_value": "50"
+   }
+  },
+  {
+   "sys_id": {
+    "value": "t0000000000000000000000000000004",
+    "display_value": "t0000000000000000000000000000004"
+   },
+   "sys_updated_on": {
+    "value": "2026-09-01 08:00:00",
+    "display_value": "2026-09-01 08:00:00"
+   },
+   "number": {
+    "value": "PRJTASK0004",
+    "display_value": "PRJTASK0004"
+   },
+   "top_task": {
+    "value": "p0000000000000000000000000000001",
+    "display_value": "PRJ0010001"
+   },
+   "short_description": {
+    "value": "Task 4",
+    "display_value": "Task 4"
+   },
+   "start_date": {
+    "value": "2026-02-01",
+    "display_value": "2026-02-01"
+   },
+   "end_date": {
+    "value": "2026-06-30",
+    "display_value": "2026-06-30"
+   },
+   "assigned_to": {
+    "value": "u0000000000000000000000000000004",
+    "display_value": "Ruben Costa"
+   },
+   "assignment_group": {
+    "value": "g0000000000000000000000000000004",
+    "display_value": "Team Orion"
+   },
+   "state": {
+    "value": "2",
+    "display_value": "Work in Progress"
+   },
+   "percent_complete": {
+    "value": "50",
+    "display_value": "50"
+   }
+  }
+ ],
+ "risk": [
+  {
+   "sys_id": {
+    "value": "r0000000000000000000000000000001",
+    "display_value": "r0000000000000000000000000000001"
+   },
+   "sys_updated_on": {
+    "value": "2026-09-01 08:00:00",
+    "display_value": "2026-09-01 08:00:00"
+   },
+   "number": {
+    "value": "RSK0001",
+    "display_value": "RSK0001"
+   },
+   "task": {
+    "value": "p0000000000000000000000000000001",
+    "display_value": "PRJ0010001"
+   },
+   "short_description": {
+    "value": "Supplier delay 1",
+    "display_value": "Supplier delay 1"
+   },
+   "probability": {
+    "value": "2",
+    "display_value": "2 - High"
+   },
+   "impact": {
+    "value": "3",
+    "display_value": "3 - Moderate"
+   },
+   "risk_response": {
+    "value": "mitigate",
+    "display_value": "Mitigate"
+   },
+   "assigned_to": {
+    "value": "u0000000000000000000000000000001",
+    "display_value": "Priya Raman"
+   },
+   "due_date": {
+    "value": "2026-11-30",
+    "display_value": "2026-11-30"
+   },
+   "mitigation_plan": {
+    "value": "Second supplier",
+    "display_value": "Second supplier"
+   }
+  },
+  {
+   "sys_id": {
+    "value": "r0000000000000000000000000000002",
+    "display_value": "r0000000000000000000000000000002"
+   },
+   "sys_updated_on": {
+    "value": "2026-09-01 08:00:00",
+    "display_value": "2026-09-01 08:00:00"
+   },
+   "number": {
+    "value": "RSK0002",
+    "display_value": "RSK0002"
+   },
+   "task": {
+    "value": "p0000000000000000000000000000002",
+    "display_value": "PRJ0010002"
+   },
+   "short_description": {
+    "value": "Supplier delay 2",
+    "display_value": "Supplier delay 2"
+   },
+   "probability": {
+    "value": "2",
+    "display_value": "2 - High"
+   },
+   "impact": {
+    "value": "3",
+    "display_value": "3 - Moderate"
+   },
+   "risk_response": {
+    "value": "mitigate",
+    "display_value": "Mitigate"
+   },
+   "assigned_to": {
+    "value": "u0000000000000000000000000000002",
+    "display_value": "Priya Raman"
+   },
+   "due_date": {
+    "value": "2026-11-30",
+    "display_value": "2026-11-30"
+   },
+   "mitigation_plan": {
+    "value": "Second supplier",
+    "display_value": "Second supplier"
+   }
+  }
+ ],
+ "project_status": [
+  {
+   "sys_id": {
+    "value": "s0000000000000000000000000000001",
+    "display_value": "s0000000000000000000000000000001"
+   },
+   "sys_updated_on": {
+    "value": "2026-09-01 08:00:00",
+    "display_value": "2026-09-01 08:00:00"
+   },
+   "number": {
+    "value": "PRJSTAT0001",
+    "display_value": "PRJSTAT0001"
+   },
+   "project": {
+    "value": "p0000000000000000000000000000001",
+    "display_value": "PRJ0010001"
+   },
+   "as_on": {
+    "value": "2026-09-26",
+    "display_value": "2026-09-26"
+   },
+   "overall_health": {
+    "value": "yellow",
+    "display_value": "Yellow"
+   },
+   "schedule": {
+    "value": "green",
+    "display_value": "Green"
+   },
+   "cost": {
+    "value": "yellow",
+    "display_value": "Yellow"
+   },
+   "resources": {
+    "value": "green",
+    "display_value": "Green"
+   },
+   "scope": {
+    "value": "green",
+    "display_value": "Green"
+   }
+  },
+  {
+   "sys_id": {
+    "value": "s0000000000000000000000000000002",
+    "display_value": "s0000000000000000000000000000002"
+   },
+   "sys_updated_on": {
+    "value": "2026-09-01 08:00:00",
+    "display_value": "2026-09-01 08:00:00"
+   },
+   "number": {
+    "value": "PRJSTAT0002",
+    "display_value": "PRJSTAT0002"
+   },
+   "project": {
+    "value": "p0000000000000000000000000000002",
+    "display_value": "PRJ0010002"
+   },
+   "as_on": {
+    "value": "2026-09-26",
+    "display_value": "2026-09-26"
+   },
+   "overall_health": {
+    "value": "yellow",
+    "display_value": "Yellow"
+   },
+   "schedule": {
+    "value": "green",
+    "display_value": "Green"
+   },
+   "cost": {
+    "value": "yellow",
+    "display_value": "Yellow"
+   },
+   "resources": {
+    "value": "green",
+    "display_value": "Green"
+   },
+   "scope": {
+    "value": "green",
+    "display_value": "Green"
+   }
+  }
+ ]
+}

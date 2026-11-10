@@ -1,0 +1,39 @@
+# Demo portfolio (ServiceNow export, JSON) through the generic mapping: every table under its own name,
+# columns unchanged. Load it with DATA_SOURCE=mapped and MAPPING_FILE=data/mappings/servicenow_demo.yaml.
+# A customer mapping renames sheets and columns, translates values and units and unpivots year columns –
+# see docs/DATA_MAPPING.md.
+name: Demo portfolio (ServiceNow export)
+sources:
+  demo:
+    type: json
+    path: ../DerKurator_Demo_Portfolio.json
+default_source: demo
+tables:
+  Projects: {}
+  Project_Tasks: {}
+  Resource_Plans: {}
+  Stakeholders: {}
+  Risks: {}
+  Stories: {}
+  Dependencies: {}
+  Cost_Plans: {}
+  Benefit_Plans: {}
+  Status_Reports: {}
+  Baselines: {}
+  Approvals: {}
+  Reserve_Ledger: {}
+  Team_Skills: {}
+  Skill_Demand: {}
+  Benefit_Actuals: {}
+  Exchange_Rates: {}
+  Strategic_Goals: {}
+  Project_Goals: {}
+  Demands: {}
+  Demand_Year_Plans: {}
+  Demand_Resource_Plans: {}
+  Scoring_Model: {}
+  Demand_Scores: {}
+  Budget_Envelopes: {}
+  Capacity_Limits: {}
+  Planning_Scenarios: {}
+  Planning_Items: {}

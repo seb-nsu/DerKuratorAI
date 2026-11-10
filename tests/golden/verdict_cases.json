@@ -1,0 +1,1239 @@
+{
+ "description": "Golden verdict cases: guided plans on tests/golden/portfolio_golden.json with a fixed as_of. No parser, no LLM. See tests/test_verdict_golden.py. expected_facts are calculated by hand from the portfolio: new budget = budget ± change; overrun = EAC − new budget, overrun % = EAC / new budget − 1; ROI = (benefit − max(EAC, new total)) / max(EAC, new total); cost of delay = ETC / remaining months × months delayed (remaining = days to the planned end / 30.44), new EAC = EAC + cost of delay.",
+ "cases": [
+  {
+   "id": "GC-01",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "value": 5,
+     "is_perc": true,
+     "direction": "increase"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0,
+   "expected_changes": [
+    {
+     "field": "budget_cost_eur",
+     "old": 500000,
+     "new": 525000
+    }
+   ]
+  },
+  {
+   "id": "GC-02",
+   "scenario": {
+    "action": "budget_transfer",
+    "project": "G-02",
+    "target": "G-11",
+    "params": {
+     "amount": 50000
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0
+  },
+  {
+   "id": "GC-03",
+   "scenario": {
+    "action": "cancel",
+    "project": "G-02",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0,
+   "expected_changes": [
+    {
+     "field": "state",
+     "old": "Work in Progress",
+     "new": "Canceled"
+    }
+   ]
+  },
+  {
+   "id": "GC-04",
+   "scenario": {
+    "action": "resource_transfer",
+    "project": "G-02",
+    "target": "G-11",
+    "params": {
+     "fte": 0.5
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0
+  },
+  {
+   "id": "GC-05",
+   "scenario": {
+    "action": "schedule",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "months_delta": -1
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0
+  },
+  {
+   "id": "GC-10",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "value": 30,
+     "is_perc": true,
+     "direction": "decrease"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "NO-GO",
+   "expected_rule": "budget_overrun_nogo",
+   "reason_contains": "above the NO-GO threshold of 15 %",
+   "expected_conditions": 0,
+   "expected_facts": [
+    {
+     "type": "budget_change",
+     "project": "G-02",
+     "delta": -150000.0,
+     "new_budget": 350000.0
+    },
+    {
+     "type": "budget_overrun",
+     "project": "G-02",
+     "eac": 450000.0,
+     "new_budget": 350000.0,
+     "overrun": 100000.0,
+     "overrun_pct": 28.6
+    }
+   ],
+   "expected_condition_texts": []
+  },
+  {
+   "id": "GC-11",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "value": 15,
+     "is_perc": true,
+     "direction": "decrease"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "budget_overrun",
+   "reason_contains": "forecast exceeds the new budget",
+   "expected_conditions": 1,
+   "expected_facts": [
+    {
+     "type": "budget_change",
+     "project": "G-02",
+     "delta": -75000.0,
+     "new_budget": 425000.0
+    },
+    {
+     "type": "budget_overrun",
+     "project": "G-02",
+     "eac": 450000.0,
+     "new_budget": 425000.0,
+     "overrun": 25000.0,
+     "overrun_pct": 5.9
+    }
+   ],
+   "expected_condition_texts": [
+    "Close the forecast gap of €25,000 on G-02 (scope, contingency or budget)."
+   ]
+  },
+  {
+   "id": "GC-12",
+   "scenario": {
+    "action": "schedule",
+    "project": "G-08",
+    "target": null,
+    "params": {
+     "months_delta": 6
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "NO-GO",
+   "expected_rule": "budget_overrun_nogo",
+   "reason_contains": "above the NO-GO threshold of 15 %",
+   "expected_conditions": 0,
+   "expected_facts": [
+    {
+     "type": "budget_overrun",
+     "project": "G-08",
+     "eac": 145034.52,
+     "new_budget": 100000.0,
+     "overrun": 45034.52,
+     "overrun_pct": 45.0
+    }
+   ],
+   "expected_condition_texts": []
+  },
+  {
+   "id": "GC-13",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "value": 150,
+     "is_perc": true,
+     "direction": "increase"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "NO-GO",
+   "expected_rule": "guardrail",
+   "reason_contains": "exceeds the limit",
+   "expected_conditions": 0
+  },
+  {
+   "id": "GC-14",
+   "scenario": {
+    "action": "schedule",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "months_delta": 40
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "NO-GO",
+   "expected_rule": "guardrail",
+   "reason_contains": "exceeds the limit of ±36",
+   "expected_conditions": 0
+  },
+  {
+   "id": "GC-15",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-03",
+    "target": null,
+    "params": {
+     "value": 5,
+     "is_perc": true,
+     "direction": "increase"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "eac_missing",
+   "reason_contains": "no estimate at completion",
+   "expected_conditions": 1,
+   "expected_facts": [
+    {
+     "type": "budget_change",
+     "project": "G-03",
+     "delta": 25000.0,
+     "new_budget": 525000.0
+    },
+    {
+     "type": "eac_missing",
+     "project": "G-03"
+    }
+   ],
+   "expected_condition_texts": [
+    "Provide a current EAC for G-03 and re-run the scenario before execution."
+   ]
+  },
+  {
+   "id": "GC-16",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-04",
+    "target": null,
+    "params": {
+     "value": 20,
+     "is_perc": true,
+     "direction": "increase"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "negative_roi",
+   "reason_contains": "ROI turns negative",
+   "expected_conditions": 1,
+   "expected_facts": [
+    {
+     "type": "budget_change",
+     "project": "G-04",
+     "delta": 120000.0,
+     "new_budget": 720000.0
+    },
+    {
+     "type": "negative_roi",
+     "project": "G-04",
+     "new_roi": -9.7
+    }
+   ],
+   "expected_condition_texts": [
+    "Re-validate the business case of G-04 with its sponsor."
+   ]
+  },
+  {
+   "id": "GC-17",
+   "scenario": {
+    "action": "resource_transfer",
+    "project": "G-05",
+    "target": "G-02",
+    "params": {
+     "fte": 1
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "overload",
+   "reason_contains": "team utilisation after the transfer",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-18",
+   "scenario": {
+    "action": "schedule",
+    "project": "G-06",
+    "target": null,
+    "params": {
+     "months_delta": 3
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "deadline_breach",
+   "reason_contains": "misses the required-by date",
+   "expected_conditions": 4,
+   "expected_facts": [
+    {
+     "type": "budget_overrun",
+     "project": "G-06",
+     "eac": 1025095.89,
+     "new_budget": 1000000.0,
+     "overrun": 25095.89,
+     "overrun_pct": 2.5
+    }
+   ],
+   "expected_condition_texts": [
+    "Close the forecast gap of €25,096 on G-06 (scope, contingency or budget).",
+    "Agree a new delivery date or a mitigation with G-07 (required by 2030-08-15).",
+    "Agree a new delivery date or a mitigation with G-10 (required by 2030-08-15).",
+    "Align the 2 dependent project(s) of G-06 before execution."
+   ]
+  },
+  {
+   "id": "GC-19",
+   "scenario": {
+    "action": "on_hold",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "months": 3
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "on_hold",
+   "reason_contains": "is paused for 3 months",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-20",
+   "scenario": {
+    "action": "schedule",
+    "project": "G-09",
+    "target": null,
+    "params": {
+     "months_delta": 6
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "npv_negative",
+   "reason_contains": "NPV turns negative",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-21",
+   "scenario": {
+    "action": "cancel",
+    "project": "G-06",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "domino",
+   "reason_contains": "2 dependent project(s) affected",
+   "expected_conditions": 2
+  },
+  {
+   "id": "GC-22",
+   "scenario": {
+    "action": "on_hold",
+    "project": "G-06",
+    "target": null,
+    "params": {
+     "months": 2
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "domino",
+   "reason_contains": "2 dependent project(s) affected",
+   "expected_conditions": 4
+  },
+  {
+   "id": "GC-23",
+   "scenario": {
+    "action": "portfolio_cut",
+    "project": null,
+    "target": null,
+    "params": {
+     "target_eur": 500000
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "portfolio_cut",
+   "reason_contains": "Portfolio cut stops 1 project(s): G-06",
+   "expected_conditions": 2
+  },
+  {
+   "id": "GC-24",
+   "scenario": {
+    "action": "portfolio_cut",
+    "project": null,
+    "target": null,
+    "params": {
+     "target_eur": 100000000
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "portfolio_cut_missed",
+   "reason_contains": "Savings target not reached",
+   "expected_conditions": 2
+  },
+  {
+   "id": "GC-25",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-01",
+    "target": null,
+    "params": {
+     "value": 60,
+     "is_perc": true,
+     "direction": "increase"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "board_approval",
+   "reason_contains": "exceeds the board approval threshold",
+   "expected_conditions": 1,
+   "expected_facts": [
+    {
+     "type": "budget_change",
+     "project": "G-01",
+     "delta": 600000.0,
+     "new_budget": 1600000.0
+    }
+   ],
+   "expected_condition_texts": [
+    "Obtain board approval for the budget change of G-01."
+   ]
+  },
+  {
+   "id": "GC-26",
+   "scenario": {
+    "action": "cancel",
+    "project": "G-02",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "graph_unavailable",
+   "reason_contains": "Graph database unavailable",
+   "expected_conditions": 1,
+   "inject": "graph_down"
+  },
+  {
+   "id": "GC-27",
+   "scenario": null,
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "ai_estimate",
+   "reason_contains": "heuristic placeholder",
+   "expected_conditions": 1,
+   "plan": [
+    {
+     "intent_type": "simulation",
+     "project_ids": [
+      "G-02"
+     ],
+     "parameters": {
+      "action": "unstructured",
+      "scenario_desc": "The main supplier drops out"
+     }
+    }
+   ]
+  },
+  {
+   "id": "GC-28",
+   "scenario": {
+    "action": "resource_transfer",
+    "project": "G-11",
+    "target": "G-02",
+    "params": {
+     "fte": 1.5
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "tool_warning",
+   "reason_contains": "Tool warning: Ramp-up",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-29",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-12",
+    "target": null,
+    "params": {
+     "value": 5,
+     "is_perc": true,
+     "direction": "increase"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "forced",
+   "reason_contains": "Forced simulation for G-12",
+   "expected_conditions": 1,
+   "force": true
+  },
+  {
+   "id": "GC-30",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-12",
+    "target": null,
+    "params": {
+     "value": 5,
+     "is_perc": true,
+     "direction": "increase"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "NO-GO",
+   "expected_rule": "quality_gate",
+   "reason_contains": "blocked by the Data Steward quality gate",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-31",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-99",
+    "target": null,
+    "params": {
+     "value": 5,
+     "is_perc": true,
+     "direction": "increase"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "ANALYSIS INCOMPLETE",
+   "expected_rule": "input_error",
+   "reason_contains": "could not be evaluated",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-32",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "value": 5,
+     "is_perc": true,
+     "direction": "increase"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "ANALYSIS INCOMPLETE",
+   "expected_rule": "internal_error",
+   "reason_contains": "internal error",
+   "expected_conditions": 1,
+   "inject": "internal_error"
+  },
+  {
+   "id": "GC-33",
+   "scenario": null,
+   "as_of": "2029-06-30",
+   "expected_verdict": "NO DECISION REQUIRED",
+   "expected_rule": "analysis",
+   "reason_contains": "Analysis only",
+   "expected_conditions": 0,
+   "plan": [
+    {
+     "intent_type": "graph_analysis",
+     "project_ids": [
+      "G-06"
+     ],
+     "parameters": {
+      "action": "downstream/upstream"
+     }
+    }
+   ]
+  },
+  {
+   "id": "GC-34",
+   "scenario": {
+    "action": "budget_transfer",
+    "project": "G-02",
+    "target": "G-11",
+    "params": {
+     "amount": 100000
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "budget_overrun",
+   "reason_contains": "forecast exceeds the new budget",
+   "expected_conditions": 1,
+   "expected_facts": [
+    {
+     "type": "budget_change",
+     "project": "G-02",
+     "delta": -100000.0,
+     "new_budget": 400000.0
+    },
+    {
+     "type": "budget_overrun",
+     "project": "G-02",
+     "eac": 450000.0,
+     "new_budget": 400000.0,
+     "overrun": 50000.0,
+     "overrun_pct": 12.5
+    },
+    {
+     "type": "budget_change",
+     "project": "G-11",
+     "delta": 100000.0,
+     "new_budget": 600000.0
+    }
+   ],
+   "expected_condition_texts": [
+    "Close the forecast gap of €50,000 on G-02 (scope, contingency or budget)."
+   ]
+  },
+  {
+   "id": "GC-35",
+   "scenario": {
+    "action": "on_hold",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "months": 2,
+     "retention_pct": 0
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "tool_warning",
+   "reason_contains": "Tool warning: No capacity kept",
+   "expected_conditions": 2
+  },
+  {
+   "id": "GC-36",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "value": 30,
+     "is_perc": true,
+     "direction": "decrease"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "budget_overrun",
+   "reason_contains": "forecast exceeds the new budget",
+   "expected_conditions": 1,
+   "rules": {
+    "eac_overrun_nogo_pct": 30
+   },
+   "same_as": "GC-10",
+   "expected_facts": [
+    {
+     "type": "budget_change",
+     "project": "G-02",
+     "delta": -150000.0,
+     "new_budget": 350000.0
+    },
+    {
+     "type": "budget_overrun",
+     "project": "G-02",
+     "eac": 450000.0,
+     "new_budget": 350000.0,
+     "overrun": 100000.0,
+     "overrun_pct": 28.6
+    }
+   ],
+   "expected_condition_texts": [
+    "Close the forecast gap of €100,000 on G-02 (scope, contingency or budget)."
+   ]
+  },
+  {
+   "id": "GC-37",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-06",
+    "target": null,
+    "params": {
+     "value": 10,
+     "is_perc": true,
+     "direction": "increase"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "Dependent projects informed, not at risk",
+   "expected_conditions": 0
+  },
+  {
+   "id": "GC-38",
+   "scenario": {
+    "action": "budget_change",
+    "project": "G-06",
+    "target": null,
+    "params": {
+     "value": 5,
+     "is_perc": true,
+     "direction": "decrease"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "domino",
+   "reason_contains": "2 dependent project(s) affected",
+   "expected_conditions": 1,
+   "expected_facts": [
+    {
+     "type": "budget_change",
+     "project": "G-06",
+     "delta": -50000.0,
+     "new_budget": 950000.0
+    }
+   ],
+   "expected_condition_texts": [
+    "Align the 2 dependent project(s) of G-06 before execution."
+   ]
+  },
+  {
+   "id": "GC-39",
+   "scenario": {
+    "action": "cancel",
+    "project": "G-06",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "cancel_review",
+   "reason_contains": "Stopping G-06: other projects depend on it (hard dependency) and it gives up €2,000,000 of planned benefit",
+   "expected_conditions": 2
+  },
+  {
+   "id": "GC-40",
+   "scenario": {
+    "action": "cancel",
+    "project": "G-12",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "indicative",
+   "reason_contains": "master data incomplete",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-41",
+   "scenario": {
+    "action": "resume",
+    "project": "G-13",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0,
+   "expected_changes": [
+    {
+     "field": "state",
+     "old": "On Hold",
+     "new": "Work in Progress"
+    }
+   ]
+  },
+  {
+   "id": "GC-42",
+   "scenario": {
+    "action": "resume",
+    "project": "G-13",
+    "target": null,
+    "params": {
+     "fte": 1
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "resume_team",
+   "reason_contains": "restarts with 1 FTE instead of 2 FTE",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-43",
+   "scenario": {
+    "action": "cost_stress",
+    "project": null,
+    "target": null,
+    "params": {
+     "pct": 5,
+     "cost_type": "all"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "no project would newly breach the EAC rule at +5 %",
+   "expected_conditions": 0
+  },
+  {
+   "id": "GC-44",
+   "scenario": {
+    "action": "cost_stress",
+    "project": null,
+    "target": null,
+    "params": {
+     "pct": 20,
+     "cost_type": "all"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "cost_stress",
+   "reason_contains": "2 project(s) would breach the EAC rule at +20 % cost: G-08, G-04",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-45",
+   "scenario": {
+    "action": "rebaseline",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "new_budget_eur": 550000,
+     "reason": "Scope extension approved"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0,
+   "expected_changes": [
+    {
+     "field": "budget_cost_eur",
+     "old": 500000,
+     "new": 550000.0
+    }
+   ]
+  },
+  {
+   "id": "GC-46",
+   "scenario": {
+    "action": "rebaseline",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "new_budget_eur": 650000,
+     "reason": "Scope extension approved"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "rebaseline_board",
+   "reason_contains": "re-baseline deviates 30 % from the original baseline",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-47",
+   "scenario": {
+    "action": "rebaseline",
+    "project": "G-09",
+    "target": null,
+    "params": {
+     "new_budget_eur": 720000,
+     "reason": "Vendor price change"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "rebaseline_count",
+   "reason_contains": "re-baseline no. 3 within 12 months (limit 2)",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-48",
+   "scenario": {
+    "action": "stage_gate",
+    "project": "G-14",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0,
+   "expected_changes": [
+    {
+     "field": "phase",
+     "old": "Planning",
+     "new": "Executing"
+    }
+   ]
+  },
+  {
+   "id": "GC-49",
+   "scenario": {
+    "action": "stage_gate",
+    "project": "G-15",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "NO-GO",
+   "expected_rule": "gate_mandatory",
+   "reason_contains": "gate criteria not met: Baseline recorded (no baseline)",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-50",
+   "scenario": {
+    "action": "stage_gate",
+    "project": "G-16",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "gate_advisory",
+   "reason_contains": "advisory gate criterion not met – Resource plan for the next 3 months",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-51",
+   "scenario": {
+    "action": "reserve_draw",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "amount": 50000,
+     "reason": "Unplanned licence cost"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0
+  },
+  {
+   "id": "GC-52",
+   "scenario": {
+    "action": "reserve_draw",
+    "project": "G-01",
+    "target": null,
+    "params": {
+     "amount": 180000,
+     "reason": "Unplanned licence cost"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "reserve_floor",
+   "reason_contains": "Management reserve falls to €20,000, below its floor of €40,000",
+   "expected_conditions": 1,
+   "rules": {
+    "management_reserve_eur": 200000
+   }
+  },
+  {
+   "id": "GC-53",
+   "scenario": {
+    "action": "reserve_draw",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "amount": 50000,
+     "direction": "return"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0
+  },
+  {
+   "id": "GC-54",
+   "scenario": {
+    "action": "skill_transfer",
+    "project": "G-11",
+    "target": "G-02",
+    "params": {
+     "skill": "Golden Skill",
+     "fte": 0.5,
+     "months": 1
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0
+  },
+  {
+   "id": "GC-55",
+   "scenario": {
+    "action": "skill_transfer",
+    "project": "G-11",
+    "target": "G-02",
+    "params": {
+     "skill": "Golden Skill",
+     "fte": 1.5,
+     "months": 1
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "overload",
+   "reason_contains": "skill 'Golden Skill' utilisation after the transfer 187.5 %",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-56",
+   "scenario": {
+    "action": "risk_response",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "risk_number": "GK-2",
+     "response": "Mitigate",
+     "cost_eur": 20000
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0,
+   "expected_changes": [
+    {
+     "field": "probability",
+     "old": "High",
+     "new": "Moderate"
+    }
+   ]
+  },
+  {
+   "id": "GC-57",
+   "scenario": {
+    "action": "risk_response",
+    "project": "G-06",
+    "target": null,
+    "params": {
+     "risk_number": "GK-1",
+     "response": "Mitigate",
+     "cost_eur": 100000
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "risk_low_benefit",
+   "reason_contains": "costs €100,000 but removes only €75,000 of exposure",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-58",
+   "scenario": {
+    "action": "risk_response",
+    "project": "G-02",
+    "target": null,
+    "params": {
+     "risk_number": "GK-2",
+     "response": "Accept"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "risk_accept_high",
+   "reason_contains": "high/high risk GK-2 is accepted",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-59",
+   "scenario": {
+    "action": "benefit_review",
+    "project": "G-17",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "GO",
+   "expected_rule": "none",
+   "reason_contains": "All simulations within guardrails",
+   "expected_conditions": 0
+  },
+  {
+   "id": "GC-60",
+   "scenario": {
+    "action": "benefit_review",
+    "project": "G-18",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "benefit_shortfall",
+   "reason_contains": "benefit realisation 51.4 % is below 80 %",
+   "expected_conditions": 2
+  },
+  {
+   "id": "GC-61",
+   "scenario": {
+    "action": "benefit_review",
+    "project": "G-18",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "benefit_unreported",
+   "reason_contains": "GB-18-3 is due since 2029-01-15 (166 days)",
+   "expected_conditions": 1,
+   "rules": {
+    "benefit_realization_min_pct": 50
+   }
+  },
+  {
+   "id": "GC-62",
+   "scenario": {
+    "action": "benefit_review",
+    "project": "G-19",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "NO-GO",
+   "expected_rule": "benefit_case_failed",
+   "reason_contains": "only 20 % of the due benefit is realised (€90,000 of €450,000)",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-63",
+   "scenario": {
+    "action": "merge",
+    "project": "G-08",
+    "target": "G-04",
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "merge",
+   "reason_contains": "G-08 is merged into G-04",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-64",
+   "scenario": {
+    "action": "merge",
+    "project": "G-02",
+    "target": "G-11",
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "merge_cross_unit",
+   "reason_contains": "spans two business units (Finance / Operations)",
+   "expected_conditions": 2
+  },
+  {
+   "id": "GC-65",
+   "scenario": {
+    "action": "portfolio_cut",
+    "project": null,
+    "target": null,
+    "params": {
+     "target_eur": 300000,
+     "method": "value"
+    }
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "portfolio_cut",
+   "reason_contains": "Portfolio cut stops 1 project(s): G-02",
+   "expected_conditions": 1
+  },
+  {
+   "id": "GC-66",
+   "scenario": {
+    "action": "cancel",
+    "project": "G-02",
+    "target": null,
+    "params": {}
+   },
+   "as_of": "2029-06-30",
+   "expected_verdict": "CONDITIONAL GO",
+   "expected_rule": "cancel_review",
+   "reason_contains": "gives up €900,000 of planned benefit (threshold €800,000)",
+   "expected_conditions": 1,
+   "rules": {
+    "cancel_conditional_benefit_eur": 800000
+   }
+  }
+ ]
+}

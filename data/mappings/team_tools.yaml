@@ -1,0 +1,63 @@
+# Team tools: the portfolio from the ServiceNow demo export, the tasks of single projects from Microsoft Planner and
+# monday.com – read-only, through a local snapshot (python scripts/work_sync.py). Load it with DATA_SOURCE=mapped and
+# MAPPING_FILE=data/mappings/team_tools.yaml once the first sync has run.
+#
+# Credentials only as secrets, never in this file: MS_GRAPH_TOKEN, or MS_GRAPH_TENANT_ID + MS_GRAPH_CLIENT_ID +
+# MS_GRAPH_CLIENT_SECRET (Planner, application permission Tasks.Read.All); MONDAY_TOKEN (monday.com, boards:read).
+#
+# Each plan or board names the DerKurator project it belongs to; its tasks or items then carry that project number.
+# The plan and board ids below are placeholders – replace them with your own (Planner: the plan's URL in Teams or
+# planner.cloud.microsoft; monday.com: the number in the board's URL). monday.com column ids differ per board: the
+# snapshot shows each column value as col_<column id>, map the ones you need. Planner has no effort field, so the
+# tasks carry no planned_effort_hours – the import report names it, nothing is guessed.
+name: Portfolio with team tools (ServiceNow, Planner, monday.com)
+sources:
+  snow:
+    type: json
+    path: ../DerKurator_Demo_Portfolio.json
+    writable: false
+    label: ServiceNow
+  planner:
+    type: planner
+    path: ../team_tools_snapshot/planner
+    label: Microsoft Planner
+    options:
+      plans:
+        "xqQg5FS2LkCp935s-FIFm2QAFkHM": {project: PRJ-DEMO-1002}
+  monday:
+    type: monday
+    path: ../team_tools_snapshot/monday
+    label: monday.com
+    options:
+      boards:
+        "1234567890": {project: PRJ-DEMO-1001}
+default_source: snow
+store: ../team_tools_snapshot/approved_changes.json   # approved changes stay here, never written back to the tools
+tables:
+  Project_Tasks:
+    - {source: snow}
+    - source: planner
+      from: planner_tasks
+      columns:
+        id: task_number
+        project_number: project_number
+        title: short_description
+        start_date: planned_start_date
+        due_date: planned_end_date
+        bucket: assignment_group
+        state: state
+        percent_complete: percent_complete
+    - source: monday
+      from: monday_items
+      columns:
+        id: task_number
+        project_number: project_number
+        name: short_description
+        group: assignment_group
+        col_status: state
+        col_timeline_start: planned_start_date
+        col_date: planned_end_date
+      values:
+        state: {"Done": Closed Complete, "Working on it": Work in Progress, "Stuck": Work in Progress, "": Open}
+      defaults:
+        percent_complete: 0

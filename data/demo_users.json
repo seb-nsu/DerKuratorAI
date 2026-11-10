@@ -1,0 +1,77 @@
+{
+ "description": "Demo accounts – valid only in DEV and TEST (PROD refuses them). The public demo password below is shown on the sign-in page in DEV/TEST; it protects nothing real. PMO-ADMIN is the PMO Head (pmo_head: true) and owns the business rules and required fields; PMO-DEPUTY can read them. DEMO-ADMIN opens the Admin Console for reviewers of the hosted demo; it never shows a stored API key. Real accounts: create them with scripts/hash_password.py and set AUTH_EXTRA_USERS (keeps the demo accounts) or AUTH_USERS_FILE (real accounts only).",
+ "public_demo_password": "kurator-demo",
+ "users": [
+  {
+   "user_id": "PMO-ADMIN",
+   "role": "PMO (Full Access)",
+   "display_name": "PMO Head",
+   "demo": true,
+   "pmo_head": true,
+   "password_hash": "pbkdf2_sha256$600000$LoiKmpGn3ouwtcPrzSmk1Q==$0tyEyIp2xgjpzt5LtDqvmkaxodVzzrRWyiLKAt7oMeI="
+  },
+  {
+   "user_id": "PMO-DEPUTY",
+   "role": "PMO (Full Access)",
+   "display_name": "PMO – Deputy",
+   "demo": true,
+   "password_hash": "pbkdf2_sha256$600000$q5BBEFoZaeCRTVgnArE5Qw==$7qCciKSOgnwhHFroXkXm2Ltek1cfU/oMhOV6S1g4yZI="
+  },
+  {
+   "user_id": "Rowan Ellis",
+   "role": "Project Manager (Restricted)",
+   "display_name": "Rowan Ellis",
+   "demo": true,
+   "password_hash": "pbkdf2_sha256$600000$GZMcGuAHl+Gwr+pMmY+FRA==$oaNBBIoMmZ6YkiLbJwtblENSh+4akplFSnSPDPpH+jY="
+  },
+  {
+   "user_id": "Tomasz Wolski",
+   "role": "Project Manager (Restricted)",
+   "display_name": "Tomasz Wolski",
+   "demo": true,
+   "password_hash": "pbkdf2_sha256$600000$jtMYALpurRNDMosmBqpe7A==$2p0LEmq2MSTstXtRQc8FzrKhtDOZofniejYv50T/j4I="
+  },
+  {
+   "user_id": "Lukas Berger",
+   "role": "Project Manager (Restricted)",
+   "display_name": "Lukas Berger",
+   "demo": true,
+   "password_hash": "pbkdf2_sha256$600000$3c/f6hbZ11OR06eUw8wkvw==$SfmDiuw1c3fV/SC2APl0Yk/2IblI0t1CIzQRCPNpPlA="
+  },
+  {
+   "user_id": "Kenji Watanabe",
+   "role": "Project Manager (Restricted)",
+   "display_name": "Kenji Watanabe",
+   "demo": true,
+   "password_hash": "pbkdf2_sha256$600000$dU5gyrtTzBcOd/B0SDyvow==$65E2FL0TjNdFx+02WqiT3kkfTxIJ0X/2iTk0OWAMLIQ="
+  },
+  {
+   "user_id": "Yusuf Demir",
+   "role": "Project Manager (Restricted)",
+   "display_name": "Yusuf Demir",
+   "demo": true,
+   "password_hash": "pbkdf2_sha256$600000$X7G3sd7qYOhGhc3QZOfbIw==$1wuw2ufELNocwh4h98h4VxAWzOY3x8y7K0MIGckZxJ4="
+  },
+  {
+   "user_id": "Priya Raman",
+   "role": "Project Manager (Restricted)",
+   "display_name": "Priya Raman",
+   "demo": true,
+   "password_hash": "pbkdf2_sha256$600000$Q9qanbNvJnJ6RGhwg3rJzA==$QDO52ekJ3ESKma4maj5xlTzAEVd84wK9SSwnU8NvCEU="
+  },
+  {
+   "user_id": "BOARD-CHAIR",
+   "role": "Portfolio Board",
+   "display_name": "Portfolio Board",
+   "demo": true,
+   "password_hash": "pbkdf2_sha256$600000$ThoVj3MC3gPTxpiEUjPeMQ==$zyE6MIgo3fpDOX4lkGCT+zwTUd2kLpurV7mRvETkC+0="
+  },
+  {
+   "user_id": "DEMO-ADMIN",
+   "role": "System Admin",
+   "display_name": "Admin",
+   "demo": true,
+   "password_hash": "pbkdf2_sha256$600000$S49nF9I6OJQ1t7k50dvRTA==$GfFWMSARxCe+djeay8bUPHX0qa6ESYkPsPJkvm04llM="
+  }
+ ]
+}

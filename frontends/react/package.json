@@ -1,0 +1,30 @@
+{
+  "name": "derkurator-react",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "React front end of DerKurator AI on the HTTP API (app/api). No business logic: every rule lives in the API.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "typecheck": "tsc -b",
+    "gen:api": "openapi-typescript openapi.json -o src/api/schema.d.ts",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "material-symbols": "0.47.6",
+    "plotly.js-dist-min": "4.1.2",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-router-dom": "7.18.4"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.1.2",
+    "openapi-typescript": "7.13.0",
+    "typescript": "5.9.3",
+    "vite": "8.3.3",
+    "vitest": "5.0.3"
+  }
+}

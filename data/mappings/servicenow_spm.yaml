@@ -1,0 +1,108 @@
+# ServiceNow SPM (Strategic Portfolio Management) through the Table API – used with DATA_SOURCE=servicenow.
+#
+# The sync reads the tables below into the snapshot folder (Admin Console › System status › "Sync ServiceNow", or
+# python scripts/servicenow_sync.py); the portfolio then loads from the snapshot. Credentials come only from the
+# secrets SERVICENOW_INSTANCE, SERVICENOW_USER + SERVICENOW_PASSWORD (or SERVICENOW_TOKEN) – never from this file.
+#
+# A reference field arrives as its sys_id (field) and its display value (field_display): for a project or task that is
+# the number, for a user or group the name, for a choice its label.
+#
+# Starting point for the standard SPM tables: check the field names against your instance (System Definition ›
+# Tables) – custom fields and other release names go into the columns below. Every column not found, every value
+# without a translation and every missing required column is listed in the import report and as a Data Steward
+# finding, nothing is guessed. Tables ServiceNow does not hold in this form (monthly cost and resource plans,
+# dependencies, the planning tables) can come from a second source, e.g. an Excel workbook (see docs/DATA_MAPPING.md).
+name: ServiceNow SPM
+sources:
+  servicenow:
+    type: servicenow
+    path: ../servicenow_snapshot
+    options:
+      instance: ""              # or the secret SERVICENOW_INSTANCE (wins)
+      page_size: 1000
+      tables:
+        pm_project:
+          query: "active=true"
+        pm_project_task:
+          query: "active=true"
+        risk:
+          query: "task.sys_class_name=pm_project"
+        project_status: {}
+default_source: servicenow
+store: ../servicenow_snapshot/approved_changes.json   # approved changes stay here, never written back to ServiceNow
+tables:
+  Projects:
+    from: pm_project
+    columns:
+      number: project_number
+      short_description: project_name
+      project_manager_display: project_manager
+      sponsor_display: project_sponsor
+      business_case: business_case
+      planned_benefit: planned_benefit_eur
+      overall_health: status
+      state_display: state
+      phase_display: phase
+      percent_complete: percent_complete
+      start_date: planned_start_date
+      work_start: actual_start_date
+      end_date: planned_end_date
+      execution_type_display: execution_type
+      priority: priority
+      primary_portfolio_display: portfolio
+      business_unit_display: business_unit
+      cost: total_planned_cost_eur
+      capex_cost: planned_capital_eur
+      opex_cost: planned_operating_eur
+      budget_cost: budget_cost_eur
+      work_cost: actual_cost_eur
+      estimate_at_completion: estimate_at_completion_eur
+      npv_value: net_present_value_eur
+    values:
+      status: {green: Green, yellow: Yellow, red: Red}
+    defaults:
+      execution_type: Waterfall
+  Project_Tasks:
+    from: pm_project_task
+    columns:
+      number: task_number
+      top_task_display: project_number
+      short_description: short_description
+      start_date: planned_start_date
+      end_date: planned_end_date
+      assigned_to_display: assigned_to
+      assignment_group_display: assignment_group
+      state_display: state
+      percent_complete: percent_complete
+  Risks:
+    from: risk
+    columns:
+      number: risk_number
+      task_display: project_number
+      short_description: short_description
+      probability_display: probability
+      impact_display: impact
+      risk_response_display: risk_status
+      assigned_to_display: assigned_to
+      due_date: due_date
+      mitigation_plan: mitigation
+    values:
+      probability: {"1 - Very High": High, "2 - High": High, "3 - Moderate": Moderate, "4 - Low": Low, "5 - Very Low": Low}
+      impact: {"1 - Very High": High, "2 - High": High, "3 - Moderate": Moderate, "4 - Low": Low, "5 - Very Low": Low}
+  Status_Reports:
+    from: project_status
+    columns:
+      number: status_number
+      project_display: project_number
+      as_on: status_date
+      overall_health: overall_health
+      schedule: schedule
+      cost: cost
+      resources: resources
+      scope: scope
+    values:
+      overall_health: {green: Green, yellow: Yellow, red: Red}
+      schedule: {green: Green, yellow: Yellow, red: Red}
+      cost: {green: Green, yellow: Yellow, red: Red}
+      resources: {green: Green, yellow: Yellow, red: Red}
+      scope: {green: Green, yellow: Yellow, red: Red}

@@ -1,0 +1,75 @@
+# Multi-source demo: the ServiceNow demo export plus the Excel project list of a business unit, combined into one
+# portfolio. Load it with DATA_SOURCE=mapped and MAPPING_FILE=data/mappings/multi_source_demo.yaml.
+# Every project row carries its source (source_system); the business unit's numbers get the prefix BU2-;
+# "duplicates" reports the projects that both sources hold. Approved changes go to the mapping's store, never into
+# either source (see docs/DATA_MAPPING.md, "Several sources for one table").
+name: Group portfolio (ServiceNow and Excel)
+sources:
+  snow:
+    type: json
+    path: ../DerKurator_Demo_Portfolio.json
+    writable: false
+    label: ServiceNow
+  bu2:
+    type: excel
+    path: bu2_portfolio.xlsx
+    writable: false
+    key_prefix: BU2-
+    label: Logistics (Excel)
+default_source: snow
+store: multi_source_demo.store.json
+duplicates:
+  Projects: [project_name, project_sponsor]
+tables:
+  Projects:
+    - {source: snow}
+    - source: bu2
+      from: Projekte
+      columns:
+        Nr: project_number
+        Bezeichnung: project_name
+        Projektleitung: project_manager
+        Auftraggeber: project_sponsor
+        Ampel: status
+        Status: state
+        Phase: phase
+        Methode: execution_type
+        Fortschritt %: percent_complete
+        Start: planned_start_date
+        Ende genehmigt: approved_end_date
+        Ende geplant: planned_end_date
+        Budget (TEUR): budget_cost_eur
+        Ist (TEUR): actual_cost_eur
+        Prognose (TEUR): estimate_at_completion_eur
+        Plankosten (TEUR): total_planned_cost_eur
+        CapEx (TEUR): planned_capital_eur
+        OpEx (TEUR): planned_operating_eur
+        Nutzen (TEUR): planned_benefit_eur
+        Business Case: business_case
+        Portfolio: portfolio
+        Bereich: business_unit
+      values: {status: {grün: Green, gelb: Yellow, rot: Red}}
+      units: {budget_cost_eur: 1000, actual_cost_eur: 1000, estimate_at_completion_eur: 1000,
+              total_planned_cost_eur: 1000, planned_capital_eur: 1000, planned_operating_eur: 1000,
+              planned_benefit_eur: 1000}
+  Project_Tasks: {}
+  Resource_Plans: {}
+  Stakeholders: {}
+  Risks: {}
+  Stories: {}
+  Dependencies: {}
+  Cost_Plans: {}
+  Benefit_Plans: {}
+  Status_Reports: {}
+  Baselines: {}
+  Approvals: {}
+  Team_Skills: {}
+  Skill_Demand: {}
+  Strategic_Goals: {}
+  Demands: {}
+  Demand_Year_Plans: {}
+  Demand_Resource_Plans: {}
+  Scoring_Model: {}
+  Demand_Scores: {}
+  Budget_Envelopes: {}
+  Capacity_Limits: {}

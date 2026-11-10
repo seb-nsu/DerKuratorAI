@@ -1,0 +1,46 @@
+# Public demo: the app in TEST and offline mode (no API key, no LLM costs) behind Caddy with automatic HTTPS.
+#   cp .env.demo.example .env.demo        # set DEMO_DOMAIN (DNS A/AAAA record points at this host)
+#   docker compose -f docker-compose.demo.yml --env-file .env.demo up -d --build
+# No volume on purpose: `up -d --force-recreate` brings the demo back to the bundled portfolio (a plain restart keeps
+# the container's changes). Run one replica: what-if runs and the dependency graph are held per process.
+services:
+  derkurator-demo:
+    build: .
+    image: derkurator:demo
+    environment:
+      ENVIRONMENT: TEST          # demo accounts on the sign-in page; PROD would refuse them
+      FORCE_OFFLINE_MODE: "true" # deterministic offline mode, even if a key reaches the container
+      FRONTEND: ${FRONTEND:-streamlit}
+      HOST: 0.0.0.0
+      PORT: "8080"
+      AUTH_ADMIN_PASSWORD: ${AUTH_ADMIN_PASSWORD:-}  # optional own admin account (min. 12 characters)
+    expose:
+      - "8080"                   # reachable only through Caddy, never published directly
+    restart: unless-stopped
+    logging: &logging
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  caddy:
+    image: caddy:2.10.0-alpine
+    environment:
+      DEMO_DOMAIN: ${DEMO_DOMAIN:?set DEMO_DOMAIN in .env.demo}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data         # certificates survive a recreate (Let's Encrypt rate limits)
+      - caddy-config:/config
+    depends_on:
+      derkurator-demo:
+        condition: service_healthy
+    restart: unless-stopped
+    logging: *logging
+
+volumes:
+  caddy-data:
+  caddy-config:

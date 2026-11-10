@@ -1,0 +1,31 @@
+# Tool configuration only (no packaging). Runtime dependencies: requirements.txt; dev tools: requirements-dev.txt.
+
+[tool.ruff]
+line-length = 120
+target-version = "py314"
+extend-exclude = ["data"]
+
+[tool.ruff.lint]
+# Error classes that find real bugs first; style rules are deliberately not enabled
+# S (bandit): security findings; every remaining exception carries a reasoned noqa at its line
+# DTZ: timestamps are timezone-aware and dates come from app.core.clock; BLE001: a broad except says why;
+# RUF100: a noqa that no longer suppresses anything is removed
+select = ["F", "E9", "E402", "E731", "I", "B", "S", "BLE001", "DTZ", "PLR0124", "PLW2901", "RUF059", "RUF100"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI declares dependencies and query parameters as argument defaults by design
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]
+
+[tool.ruff.lint.per-file-ignores]
+# tests assert by design and start their own subprocesses with fixed commands
+"tests/**" = ["S101", "S603", "S105", "S106", "S108"]
+
+[tool.coverage.run]
+source = ["app"]
+branch = true
+omit = ["app/main.py"]  # Streamlit entry point, covered through AppTest
+
+[tool.coverage.report]
+# Lower bound against regressions, a little below the measured total (86 % on 2026-10-02) so a refactor that removes
+# well-tested code does not fail the build; new code is held to the changed-lines bound in CI (diff coverage).
+fail_under = 84

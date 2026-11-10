@@ -1,0 +1,21 @@
+# Reverse proxy of the public demo (docker-compose.demo.yml): HTTPS via Let's Encrypt for DEMO_DOMAIN, WebSockets
+# (Streamlit, NiceGUI) pass through reverse_proxy unchanged. DEMO_DOMAIN=localhost gives a local test certificate.
+{$DEMO_DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		X-Content-Type-Options "nosniff"
+		X-Frame-Options "DENY"
+		Referrer-Policy "strict-origin-when-cross-origin"
+		X-Robots-Tag "noindex, nofollow"
+		-Server
+	}
+
+	# Optional: a second gate in front of the public demo password (hash: docker run --rm caddy:2.10.0-alpine caddy hash-password)
+	# basic_auth {
+	# 	demo <bcrypt hash>
+	# }
+
+	reverse_proxy derkurator-demo:8080
+}

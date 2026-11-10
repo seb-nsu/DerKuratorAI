@@ -1,0 +1,43 @@
+# DerKurator AI – pinned dependencies (verified against the test environment, Python 3.14.6; also passes on 3.12).
+# Every package the code imports is pinned to the exact version the test suite passed with.
+
+# UI
+streamlit==1.64.0
+plotly==7.1.0
+
+# HTTP API for the new front ends (app/api)
+fastapi==0.142.2
+uvicorn==0.54.0
+httpx==0.28.1  # NiceGUI calls the API in-process; API tests
+nicegui==3.17.1  # NiceGUI front end (frontends/nicegui)
+
+# MCP client SDK (enterprise connector, app/crew/tools/mcp_client.py)
+mcp==1.28.1
+
+# LLM providers – called directly through their own SDKs (app/llm); Gemini via its OpenAI-compatible endpoint
+openai==2.54.0
+anthropic==1.8.0
+
+# Dependency graph (in memory, built from the portfolio data)
+networkx==3.7
+neo4j==6.4.0  # optional second graph backend (GRAPH_BACKEND=neo4j); the driver only, no server needed by default
+portalocker==2.7.0  # cross-process locks (data-source writes, proposal/scenario logs)
+
+# Data & validation
+pydantic==2.12.5
+pandas==3.0.6
+numpy==2.5.3
+scipy==1.18.1  # exact 0-1 programme of the value-optimal annual plan (HiGHS)
+openpyxl==3.1.5
+python-dotenv==1.2.3
+pyyaml==6.0.3  # mapping files of the mapping-file data source
+
+# Tests
+pytest==9.1.1
+pytest-html==4.2.0
+
+# Observability: own LLM call log; optional OpenTelemetry export (spans + metrics, no content) when
+# OTEL_EXPORTER_OTLP_ENDPOINT is set
+opentelemetry-api==1.44.0
+opentelemetry-sdk==1.44.0
+opentelemetry-exporter-otlp-proto-http==1.44.0

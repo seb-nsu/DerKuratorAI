@@ -1,0 +1,23 @@
+/* Steering Console layout; colours only through the --dk-* variables */
+.dk-console { display: grid; gap: 16px; grid-template-columns: minmax(240px, 1fr) minmax(0, 3.2fr); align-items: start; }
+.dk-console > * { min-width: 0; }
+@media (max-width: 1023px) {
+  .dk-console { grid-template-columns: 1fr; }
+  .dk-console .dk-rail { order: 2; }
+}
+.dk-run-item { border: 1px solid var(--dk-border); border-radius: var(--dk-radius-card); padding: 10px 12px; min-width: 0; overflow-wrap: anywhere; }
+.dk-run-item.selected { border-color: var(--dk-primary); box-shadow: inset 3px 0 0 var(--dk-primary); }
+.dk-composer-top { display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+.dk-segmented { display: inline-flex; }
+.dk-segmented button { border-radius: 0; }
+.dk-segmented button:first-child { border-radius: var(--dk-radius-control) 0 0 var(--dk-radius-control); }
+.dk-segmented button:last-child { border-radius: 0 var(--dk-radius-control) var(--dk-radius-control) 0; border-left: none; }
+.dk-radio { border: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.dk-radio legend { font-size: 0.85rem; color: var(--dk-text-muted); padding: 0; margin-bottom: 4px; }
+.dk-actions { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); align-items: start; }
+.dk-toast-region { position: fixed; top: 64px; left: 50%; transform: translateX(-50%); z-index: 40; width: min(560px, calc(100vw - 32px)); }
+.dk-toast { box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18); background-clip: padding-box; }
+.dk-spinner { width: 22px; height: 22px; border-radius: 50%; border: 3px solid var(--dk-border); border-top-color: var(--dk-primary);
+  animation: dk-spin 0.9s linear infinite; }
+@keyframes dk-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .dk-spinner { animation-duration: 3s; } }

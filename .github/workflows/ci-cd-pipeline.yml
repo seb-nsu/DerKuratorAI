@@ -1,0 +1,364 @@
+name: CI/CD Pipeline
+
+# Saving Actions minutes (billed per job, each rounded up to a full minute):
+# - documentation-only changes start no run at all (paths-ignore)
+# - draft pull requests use no minutes (every job is skipped); "Ready for review" starts the checks
+# - on a pull request the jobs neo4j, react, e2e and container run only when their files changed (job `changes`)
+# - a push to main (normally the merge of a pull request that was already tested) runs only `test` and
+#   `container`; the full set can be started by hand at any time (Actions > CI/CD Pipeline > Run workflow)
+# - the former job `smoke` is gone: `container` starts the same app and runs scripts/smoke_test.py inside the image
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "LICENSE"
+      - ".vscode/**"
+      - ".devcontainer/**"
+      - "**.png"
+      - "**.jpg"
+  push:
+    branches: [main]
+    paths-ignore:
+      - "**.md"
+      - "docs/**"
+      - "LICENSE"
+      - ".vscode/**"
+      - ".devcontainer/**"
+      - "**.png"
+      - "**.jpg"
+  workflow_dispatch:
+
+# A newer commit on the same branch / PR cancels the outdated run
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  # Python 3.14 matches the tested environment of the pinned dependency set (3.14.6, see requirements.txt); the
+  # branch main stays on 3.12 until its CrewAI stack is replaced (chromadb does not run on 3.14).
+  PYTHON_VERSION: "3.14"
+
+jobs:
+  changes:
+    name: Which parts changed (pull requests only)
+    if: github.event_name == 'pull_request' && !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      graph: ${{ steps.filter.outputs.graph }}
+      react: ${{ steps.filter.outputs.react }}
+      e2e: ${{ steps.filter.outputs.e2e }}
+      container: ${{ steps.filter.outputs.container }}
+    steps:
+      - name: Compare the pull request with its base
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            deps: &deps
+              - "requirements*.txt"
+              - ".github/workflows/**"
+            graph:
+              - *deps
+              - "app/graph/**"
+              - "tests/test_graph_backends.py"
+            react:
+              - *deps
+              - "frontends/react/**"
+              - "frontends/design/**"
+            e2e:
+              - *deps
+              - "app/**"
+              - "frontends/**"
+              - "data/**"
+              - "scripts/**"
+              - "tests/e2e/**"
+              - "tests/conftest.py"
+            container:
+              - *deps
+              - "Dockerfile"
+              - ".dockerignore"
+              - "app/**"
+              - "frontends/**"
+              - "scripts/**"
+              - "data/**"
+              - ".streamlit/**"
+
+  test:
+    name: Test (Continuous Integration)
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # CI has no .env: no API keys (the suite never calls an LLM)
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # the diff coverage step compares against main
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Verify dependency consistency
+        run: pip check
+
+      - name: Lint (ruff)
+        run: ruff check .
+
+      - name: Dependency vulnerability scan (warning only)
+        # known CVEs in the pinned set are reported in the job summary; the step does not fail the build yet.
+        # Only on main and manual runs: the result does not depend on the pull request.
+        if: github.event_name != 'pull_request'
+        continue-on-error: true
+        run: |
+          pip install pip-audit
+          pip-audit -r requirements.txt --progress-spinner off 2>&1 | tee pip-audit.txt
+          { echo "### pip-audit"; echo '```'; tail -n 40 pip-audit.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Run test suite with coverage
+        # fails below the lower bound in pyproject.toml ([tool.coverage.report] fail_under)
+        run: pytest --cov --cov-report=xml --cov-report=term --junitxml=test-results.xml
+
+      - name: Coverage of the governance core
+        # stricter bounds for the verdict engine (golden cases), proposals and security (measured 2026-10-02)
+        run: |
+          coverage report --include=app/crew/verdict.py --fail-under=100
+          coverage report --include=app/core/proposals.py --fail-under=90
+          coverage report --include=app/core/security.py --fail-under=93
+
+      - name: Coverage of the changed lines
+        # a pull request covers at least 80 % of the lines it adds or changes in app/ (the total bound alone
+        # would let new code go untested as long as the rest of the suite carries the average)
+        if: github.event_name == 'pull_request'
+        run: |
+          pip install diff-cover
+          # the Neo4j backend needs a server: its lines are covered and bounded in the job `neo4j`
+          diff-cover coverage.xml --compare-branch=origin/${{ github.base_ref }} --fail-under=80 \
+            --exclude "*/neo4j_backend.py"
+
+      - name: Coverage summary
+        if: always()
+        run: |
+          {
+            echo "### Coverage"
+            echo ""
+            echo '```'
+            coverage report --skip-covered --sort=cover | tail -n 25
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload test and coverage results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            test-results.xml
+            coverage.xml
+          retention-days: 14
+
+  neo4j:
+    name: Graph backends (NetworkX and Neo4j answer the same)
+    # the tests with the marker `neo4j` against a Neo4j server; the default job runs them skipped (no NEO4J_URI)
+    needs: changes
+    # pull request: only when its files changed; manual run: always; push to main: already tested in the PR
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.changes.outputs.graph == 'true') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    services:
+      neo4j:
+        image: neo4j:5-community
+        env:
+          NEO4J_AUTH: neo4j/ci-only-password  # throwaway container of this job, not a secret
+        ports:
+          - 7687:7687
+        options: >-
+          --health-cmd "cypher-shell -u neo4j -p ci-only-password 'RETURN 1'"
+          --health-interval 5s --health-timeout 10s --health-retries 30
+    env:
+      NEO4J_URI: bolt://127.0.0.1:7687
+      NEO4J_USER: neo4j
+      NEO4J_PASSWORD: ci-only-password
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+
+      - name: Run the Neo4j tests (parity of both backends, projection, fallback)
+        # only the graph modules are measured here, so the whole-app bound of pyproject.toml does not apply
+        run: pytest -m neo4j --cov=app/graph --cov-fail-under=0 --cov-report=term
+
+      - name: Coverage of the Neo4j backend
+        run: coverage report --include=app/graph/neo4j_backend.py --fail-under=85
+
+  react:
+    name: React front end (types from the API contract, typecheck, build)
+    needs: changes
+    # pull request: only when its files changed; manual run: always; push to main: already tested in the PR
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.changes.outputs.react == 'true') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: frontends/react
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontends/react/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Types match the committed API contract
+        # the Python suite checks openapi.json against the API; this checks the TypeScript types against openapi.json
+        run: |
+          npm run gen:api
+          git diff --exit-code -- src/api/schema.d.ts
+
+      - name: Typecheck and build
+        # a changed API contract breaks this step until the React pages are updated
+        run: npm run build
+
+  e2e:
+    name: End-to-end tests (Playwright, NiceGUI and React)
+    # the same browser tests against both front ends; switching the default to React needs this job green
+    needs: changes
+    # pull request: only when its files changed; manual run: always; push to main: already tested in the PR
+    if: ${{ !cancelled() && (github.event_name == 'workflow_dispatch' || needs.changes.outputs.e2e == 'true') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    # no .env and no API keys: the servers run offline on a temp copy of the demo portfolio
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python ${{ env.PYTHON_VERSION }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: |
+            requirements.txt
+            requirements-dev.txt
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontends/react/package-lock.json
+
+      - name: Cache the Playwright browser
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('requirements-dev.txt') }}
+
+      - name: Install dependencies and Chromium
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements-dev.txt
+          if [ "${{ steps.pw-cache.outputs.cache-hit }}" = true ]; then
+            python -m playwright install-deps chromium  # system libraries only, the browser comes from the cache
+          else
+            python -m playwright install --with-deps chromium
+          fi
+
+      - name: Build the React front end
+        working-directory: frontends/react
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: Run the end-to-end suite against both front ends
+        env:
+          PLAYWRIGHT_CHROMIUM: ""  # Playwright's own Chromium from the step above
+          E2E_ARTIFACTS: e2e-artifacts
+          E2E_REQUIRED: "1"  # a missing browser or React build fails the job instead of skipping the tests
+        run: pytest -m e2e tests/e2e --junitxml=e2e-results.xml
+
+      - name: Upload screenshots of failed tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results
+          path: |
+            e2e-results.xml
+            e2e-artifacts/
+          retention-days: 14
+
+  container:
+    name: Container image (build, start each front end, health and demo sign-in)
+    # builds the Dockerfile as shipped (no push) and runs it once per front end, as the hosting template does
+    needs: changes
+    # push to main and manual run: always (the deployable image); pull request: only when its files changed
+    if: ${{ !cancelled() && (github.event_name != 'pull_request' || needs.changes.outputs.container == 'true') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Build the image
+        run: docker build -t derkurator:ci .
+
+      - name: Start each front end and check health, sign-in page and a demo sign-in
+        # TEST environment, offline, no API keys: the demo accounts are active and no LLM is called
+        run: |
+          for frontend in streamlit nicegui react; do
+            docker run -d --name "dk-$frontend" -p 8080:8080 -e FRONTEND="$frontend" \
+              -e ENVIRONMENT=TEST -e FORCE_OFFLINE_MODE=true derkurator:ci
+            state=starting
+            for _ in $(seq 60); do  # the image's HEALTHCHECK, not only an open port
+              state=$(docker inspect -f '{{.State.Health.Status}}' "dk-$frontend")
+              [ "$state" != starting ] && break
+              sleep 3
+            done
+            echo "$frontend: container $state"
+            [ "$state" = healthy ] || { docker logs "dk-$frontend"; exit 1; }
+            python3 scripts/container_smoke.py http://127.0.0.1:8080 "$frontend" || { docker logs "dk-$frontend"; exit 1; }
+            if [ "$frontend" = streamlit ]; then  # the demo sign-in of Streamlit (AppTest) inside the container
+              docker exec dk-streamlit python scripts/smoke_test.py || { docker logs dk-streamlit; exit 1; }
+            fi
+            docker rm -f "dk-$frontend"
+          done

@@ -1,0 +1,7 @@
+-r requirements.txt
+# Development and CI tools only – the app itself never imports them.
+ruff==0.16.10
+pytest-cov==7.1.0
+coverage==7.16.2
+# browser end-to-end tests (tests/e2e, pytest -m e2e); the browser itself: python -m playwright install chromium
+playwright==1.63.0

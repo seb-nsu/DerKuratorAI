@@ -1,0 +1,72 @@
+{
+  "environment": "DEV",
+  "agents": {
+    "orchestrator": {
+      "main": "claude-sonnet-5",
+      "shadow": ""
+    },
+    "data_steward": {
+      "main": "claude-haiku-4-5",
+      "shadow": ""
+    },
+    "analyst": {
+      "main": "claude-haiku-4-5",
+      "shadow": ""
+    },
+    "simulator": {
+      "main": "claude-haiku-4-5",
+      "shadow": ""
+    },
+    "advisory": {
+      "main": "claude-haiku-4-5",
+      "shadow": ""
+    }
+  },
+  "temperature": 0.1,
+  "pii_masking_enabled": true,
+  "orchestrator_prompt": "You are the Chief of Staff of the portfolio steering committee. You never calculate anything yourself; you identify which sub-questions require quantitative simulation (budget incl. CapEx/OpEx, FTE, schedules by Agile/Waterfall, project stops) and which require graph analysis (project and task dependencies, team bottlenecks, risk clusters). You map project names to the correct project numbers as listed in the portfolio.",
+  "required_fields": [
+    "project_number",
+    "project_name",
+    "project_manager",
+    "status",
+    "state",
+    "execution_type",
+    "percent_complete",
+    "planned_end_date",
+    "budget_cost_eur",
+    "actual_cost_eur",
+    "estimate_at_completion_eur",
+    "total_planned_cost_eur",
+    "planned_capital_eur",
+    "planned_operating_eur",
+    "project_sponsor",
+    "business_case",
+    "planned_benefit_eur"
+  ],
+  "mcp": {
+    "enabled": false,
+    "servers": {
+      "servicenow": "",
+      "jira": ""
+    }
+  },
+  "business_rules": {
+    "fte_monthly_cost_eur": 12500.0,
+    "exit_cost_rate_pct": 8.0,
+    "sprint_length_days": 14,
+    "max_budget_change_pct": 100.0,
+    "max_timeline_shift_months": 36,
+    "team_capacity_limit_pct": 100.0,
+    "overload_alert_pct": 110.0,
+    "default_discount_rate_pct": 7.5,
+    "hold_retention_pct": 20.0,
+    "hold_restart_ramp_months": 1.0,
+    "cut_protected_max_priority": 1,
+    "domino_conditional_threshold": 2,
+    "eac_overrun_nogo_pct": 15.0,
+    "board_approval_threshold_eur": 500000.0
+  },
+  "updated_at": "2026-09-29T20:33:22",
+  "updated_by": "SYSTEM-ADMIN"
+}

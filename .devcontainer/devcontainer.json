@@ -1,0 +1,36 @@
+{
+  "name": "DerKurator AI (Python 3.14)",
+  "image": "mcr.microsoft.com/devcontainers/python:3-3.14-bookworm",
+  "customizations": {
+    "codespaces": {
+      "openFiles": [
+        "README.md",
+        "app/main.py"
+      ]
+    },
+    "vscode": {
+      "settings": {},
+      "extensions": [
+        "ms-python.python",
+        "ms-python.vscode-pylance"
+      ]
+    }
+  },
+  "containerEnv": {
+    "ENVIRONMENT": "TEST",
+    "FORCE_OFFLINE_MODE": "true"
+  },
+  "updateContentCommand": "[ -f packages.txt ] && sudo apt update && sudo apt upgrade -y && sudo xargs apt install -y <packages.txt; pip3 install --user -r requirements.txt && echo 'Requirements installed'",
+  "postAttachCommand": {
+    "server": "streamlit run app/main.py"
+  },
+  "portsAttributes": {
+    "8501": {
+      "label": "Application",
+      "onAutoForward": "openPreview"
+    }
+  },
+  "forwardPorts": [
+    8501
+  ]
+}

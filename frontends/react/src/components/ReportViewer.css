@@ -1,0 +1,38 @@
+/* Report viewer and the console's building blocks; colours only through the --dk-* variables */
+.dk-report { min-width: 0; }
+.dk-report-head { display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 2fr); gap: 16px; }
+@media (max-width: 900px) { .dk-report-head { grid-template-columns: 1fr; } }
+/* a long status badge ("Proposal … · Waiting for approval") wraps instead of widening a narrow page */
+.dk-run-item .badge, .dk-report .badge { white-space: normal; max-width: 100%; border-radius: 12px; overflow-wrap: anywhere; }
+.dk-run-item .badge > *, .dk-report .badge > * { flex-shrink: 0; }
+.dk-report-title { font-size: 1.05rem; margin: 2px 0 4px; }
+.dk-stack { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.dk-stack-tight { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.dk-under { margin-top: 4px; }
+.dk-caption { align-items: flex-start; }
+.dk-tabs { display: flex; gap: 2px; overflow-x: auto; border-bottom: 1px solid var(--dk-border); }
+.dk-tabs [role="tab"] { border-radius: 0; border-bottom: 2px solid transparent; white-space: nowrap; color: var(--dk-text); }
+.dk-tabs [role="tab"][aria-selected="true"] { border-bottom-color: var(--dk-primary); color: var(--dk-primary); font-weight: 600; }
+.dk-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.dk-chips button { min-height: 30px; padding: 3px 10px; font-size: 0.85rem; }
+.dk-markdown { min-width: 0; overflow-wrap: anywhere; }
+.dk-markdown p { margin: 6px 0; }
+.dk-markdown ul, .dk-markdown ol { margin: 6px 0; padding-left: 22px; }
+.dk-markdown h3, .dk-markdown h4, .dk-markdown h5, .dk-markdown h6 { margin: 14px 0 6px; font-size: 1rem; }
+.dk-markdown blockquote { margin: 6px 0; padding: 4px 12px; border-left: 3px solid var(--dk-border); color: var(--dk-text-muted); }
+.dk-markdown code { font-family: var(--dk-font-mono, monospace); background: var(--dk-surface); padding: 0 4px; border-radius: 4px; }
+.dk-markdown .table-wrap { margin: 6px 0; }
+.dk-popover { position: relative; display: inline-block; }
+.dk-popover-body { position: absolute; z-index: 30; top: calc(100% + 4px); left: 0; min-width: 240px; max-width: min(92vw, 360px);
+  background: var(--dk-surface-raised); border: 1px solid var(--dk-border); border-radius: var(--dk-radius-card); padding: 12px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.18); }
+.dk-popover-body.wide { max-width: min(92vw, 620px); width: max-content; }
+.dk-popover.right .dk-popover-body { left: auto; right: 0; }
+.dk-menu-list { display: flex; flex-direction: column; align-items: stretch; }
+.dk-menu-list button { justify-content: flex-start; }
+dialog.dk-dialog { border: 1px solid var(--dk-border); border-radius: var(--dk-radius-card); background: var(--dk-surface-raised);
+  color: var(--dk-text); width: min(760px, calc(100vw - 32px)); padding: 20px; }
+dialog.dk-dialog::backdrop { background: rgba(0, 0, 0, 0.45); }
+.dk-kpi-cell { display: flex; flex-direction: column; min-width: 0; }
+.dk-kpi-cell > .card { height: auto; flex: 1; }
+.dk-popover > button { white-space: nowrap; }

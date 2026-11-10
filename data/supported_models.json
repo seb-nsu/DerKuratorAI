@@ -1,0 +1,22 @@
+{
+  "_pricing_note": "input/output_cost_per_1m = USD list price per 1M tokens (standard tier, short context), used only for FinOps cost estimates. Checked 2026-09-29 against the provider pricing pages. Gemini 3.6-3.8 Flash prices double from 2027-01-01. Verify against your provider contract.",
+  "models": [
+    {"model_id": "claude-opus-5-5", "provider": "anthropic", "is_thinking_model": false, "input_cost_per_1m": 4.0, "output_cost_per_1m": 20.0},
+    {"model_id": "claude-sonnet-5-5", "provider": "anthropic", "is_thinking_model": false, "input_cost_per_1m": 2.0, "output_cost_per_1m": 10.0},
+    {"model_id": "claude-sonnet-5", "provider": "anthropic", "is_thinking_model": false, "input_cost_per_1m": 2.0, "output_cost_per_1m": 10.0},
+    {"model_id": "claude-haiku-4-5", "provider": "anthropic", "is_thinking_model": false, "input_cost_per_1m": 1.0, "output_cost_per_1m": 5.0},
+
+    {"model_id": "gpt-6-astra", "provider": "openai", "is_thinking_model": true, "input_cost_per_1m": 5.0, "output_cost_per_1m": 25.0},
+    {"model_id": "gpt-6.1-sol", "provider": "openai", "is_thinking_model": true, "input_cost_per_1m": 1.0, "output_cost_per_1m": 5.0},
+    {"model_id": "gpt-6-luna", "provider": "openai", "is_thinking_model": true, "input_cost_per_1m": 0.05, "output_cost_per_1m": 0.25},
+    {"model_id": "gpt-4o", "provider": "openai", "is_thinking_model": false, "input_cost_per_1m": 2.5, "output_cost_per_1m": 10.0},
+    {"model_id": "gpt-4o-mini", "provider": "openai", "is_thinking_model": false, "input_cost_per_1m": 0.15, "output_cost_per_1m": 0.6},
+
+    {"model_id": "gemini/gemini-3.1-pro-preview", "provider": "google", "is_thinking_model": true, "input_cost_per_1m": 2.0, "output_cost_per_1m": 12.0},
+    {"model_id": "gemini/gemini-3.8-flash", "provider": "google", "is_thinking_model": true, "input_cost_per_1m": 0.75, "output_cost_per_1m": 3.75},
+    {"model_id": "gemini/gemini-3.5-flash", "provider": "google", "is_thinking_model": true, "input_cost_per_1m": 1.5, "output_cost_per_1m": 9.0},
+    {"model_id": "gemini/gemini-3.5-flash-lite", "provider": "google", "is_thinking_model": true, "input_cost_per_1m": 0.3, "output_cost_per_1m": 2.5},
+    {"model_id": "gemini/gemini-3.1-flash-lite", "provider": "google", "is_thinking_model": true, "input_cost_per_1m": 0.25, "output_cost_per_1m": 1.5},
+    {"model_id": "gemini/gemini-2.5-flash", "provider": "google", "is_thinking_model": false, "input_cost_per_1m": 0.3, "output_cost_per_1m": 2.5}
+  ]
+}

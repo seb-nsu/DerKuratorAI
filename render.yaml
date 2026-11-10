@@ -1,0 +1,32 @@
+# Render Blueprint of the public demo (https://render.com/docs/blueprint-spec): Render builds the Dockerfile and serves
+# the app over HTTPS at https://derkurator-demo.onrender.com (or the name Render assigns). TEST and offline mode: no API
+# key, no LLM costs. Dashboard › New › Blueprint › this repository and branch.
+#
+# Free plan: spins down after 15 minutes without traffic (first request then takes about a minute) and its file system
+# is ephemeral, so every spin-down, restart or deploy brings the demo back to the bundled portfolio.
+# For a demo without wake-up delay set plan: 0.5c-512mb (paid) or more memory with 1c-2g.
+services:
+  - type: web
+    name: derkurator-demo
+    runtime: docker
+    plan: free
+    region: frankfurt
+    dockerfilePath: ./Dockerfile
+    healthCheckPath: /_stcore/health  # Streamlit; with FRONTEND nicegui or react: /api/v1/health
+    autoDeployTrigger: commit
+    numInstances: 1  # one replica: what-if runs and the dependency graph are held per process
+    envVars:
+      - key: ENVIRONMENT
+        value: TEST          # demo accounts on the sign-in page; the image default PROD would refuse them
+      - key: FORCE_OFFLINE_MODE
+        value: "true"
+      - key: FRONTEND
+        value: streamlit
+      - key: HOST
+        value: 0.0.0.0
+      - key: PORT
+        value: "8080"
+      - key: WEB_CONCURRENCY
+        value: "1"           # Streamlit and NiceGUI run in one process; serve.py refuses more (a platform default must not leak in)
+      # Optional own admin account (min. 12 characters): add AUTH_ADMIN_PASSWORD in the dashboard
+      # (Environment), never here. Never add API keys to the demo.
