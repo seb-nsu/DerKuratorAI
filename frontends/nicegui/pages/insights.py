@@ -1,6 +1,6 @@
 """Decision insights (PMO, a sub-page of the overview): status check of the sources, the portfolio with
 probabilities, the reference class of a project, the review of past decisions with the audit pack and the transfers to
-ServiceNow. Same sections as the Streamlit page (app/ui/insights_ui.py); every figure comes from /api/v1/insights."""
+ServiceNow. Same sections as the React page; every figure comes from /api/v1/insights."""
 from __future__ import annotations
 
 from nicegui import ui

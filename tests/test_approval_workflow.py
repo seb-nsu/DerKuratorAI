@@ -7,7 +7,14 @@ import pytest
 from app.core import logs, proposals
 from app.core.proposals import APPROVED, REJECTED, SUBMITTED, ProposalError
 from app.core.security import ROLE_ADMIN, ROLE_PM, ROLE_PMO, approval_mode, can_approve
-from app.ui.steerco_pack import extract_conditions, key_metrics, metric_texts, pack_data, render_pack_html, verdict_key
+from app.views.steerco_pack import (
+    extract_conditions,
+    key_metrics,
+    metric_texts,
+    pack_data,
+    render_pack_html,
+    verdict_key,
+)
 
 BUDGET_CUT = [{"project_id": "P-1", "table": "Projects", "field": "budget_cost_eur", "old": 800000, "new": 720000}]
 SCHEDULE = [{"project_id": "P-1", "table": "Projects", "field": "planned_end_date", "old": "2030-06-30", "new": "2030-09-30"}]

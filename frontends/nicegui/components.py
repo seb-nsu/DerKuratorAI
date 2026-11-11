@@ -84,7 +84,7 @@ def verdict_callout(verdict: dict | None) -> None:
 
 
 def notify(kind: str, message: str) -> None:
-    """kind: success | warning | error | info (same meaning as in the Streamlit pages)."""
+    """kind: success | warning | error | info (same meaning as in the React pages)."""
     ui.notify(message, type={"success": "positive", "error": "negative"}.get(kind, kind), position="top",
               multi_line=True, close_button="OK" if kind == "error" else None)
 

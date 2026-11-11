@@ -11,7 +11,7 @@ from app.api.state_store import CAPS, store
 from app.core.runtime_config import get_runtime_config
 
 SPACE = "runs"
-LATEST = "latest_run"  # user id -> their latest run: only that step can be applied or saved (as in Streamlit)
+LATEST = "latest_run"  # user id -> their latest run: only that step can be applied or saved
 MAX_RUNS = CAPS[SPACE]
 
 

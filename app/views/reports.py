@@ -1,4 +1,4 @@
-"""The report viewer's content without Streamlit, shared by the Streamlit viewer (app/ui/report.py) and the HTTP API:
+"""The report viewer's content, independent of any front end and served by the HTTP API:
 one decision report (a Steering Console analysis or a proposal) as the viewer shows it – verdict, key figures, the
 change count, the tabs Summary · Decision paper · Changes · Impact · Dependencies · Data quality and their charts as
 Plotly figure JSON. Everything reads the caller's scope: projects outside it appear as one neutral node."""

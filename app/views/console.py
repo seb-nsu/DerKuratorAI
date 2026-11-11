@@ -1,4 +1,4 @@
-"""Steering Console logic without Streamlit, shared by the Streamlit page (app/ui/console.py) and the HTTP API: the
+"""Steering Console logic behind the HTTP API (app/api/routes/steering.py), independent of any front end: the
 guided scenario form (parameters, bounds, options), the chat messages of a run, the scenario memory ("builds on the
 previous step"), the status of a run, saving a what-if and the direct apply of a change set that needs no approval."""
 from __future__ import annotations
@@ -145,7 +145,7 @@ def _date(name: str, label: str) -> dict[str, Any]:
 
 
 def scenario_params(action: str, ds: PortfolioDataset, project: str | None) -> list[dict[str, Any]]:
-    """The inputs of a guided scenario as the Streamlit builder offers them: defaults, bounds and options (options and
+    """The inputs of a guided scenario as the builder offers them: defaults, bounds and options (options and
     bounds that depend on the project are computed for `project` in the scope `ds`)."""
     rules = get_runtime_config().business_rules
     if action == "budget_change":

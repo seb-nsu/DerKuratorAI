@@ -103,18 +103,18 @@ class TestProjectManagerReportAndExport:
                                               "Stop General Ledger Consolidation"])
     def test_paper_verdict_graph_and_export(self, demo, monkeypatch, request_text):
         from app.crew import pipeline
-        from app.ui import visuals
+        from app.views import charts, exports
 
         foreign = _context(demo, monkeypatch, ROLE_PM, "Priya Raman")
         view = apply_rls_to_dataset(demo[0], ROLE_PM, "Priya Raman")
         result = pipeline.run_steering_pipeline(request_text, view, ROLE_PM, "Priya Raman")
         meta = {"request": request_text, "plan": result.intent_plan.model_dump(), "verdict": result.verdict.to_dict(),
                 "proposed_changes": result.proposed_changes}
-        edges = visuals.dependency_edges(view, visuals.focus_projects(meta, set(view.project_numbers),
+        edges = exports.dependency_edges(view, exports.focus_projects(meta, set(view.project_numbers),
                                                                       result.decision_paper))
-        assert visuals.RESTRICTED_NODE in set(edges["successor"]) | set(edges["predecessor"])
-        graph = visuals.dependency_graph_figure(view, edges, [ERP]).to_json()
-        export = visuals.build_report_markdown([{"role": "user", "content": request_text},
+        assert exports.RESTRICTED_NODE in set(edges["successor"]) | set(edges["predecessor"])
+        graph = charts.dependency_graph_figure(view, edges, [ERP]).to_json()
+        export = exports.build_report_markdown([{"role": "user", "content": request_text},
                                                 {"role": "assistant", "content": result.decision_paper, "meta": meta}],
                                                view, ROLE_PM, "Priya Raman", "TEST")
         for text in (result.decision_paper, result.verdict.to_markdown(), graph, export):

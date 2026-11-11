@@ -1,6 +1,6 @@
 // The report of one proposal in the PMO inbox: the shared report viewer on GET /proposals/{id}/report with the
 // proposal's eyebrow and status badge, the export menu (SteerCo Pack, Markdown, CSV) and the report's question box –
-// as the Streamlit inbox shows it. The decision bar stays on the Approvals page.
+// as the NiceGUI inbox shows it. The decision bar stays on the Approvals page.
 import { useEffect, useState } from "react";
 import { api, ApiError, type Answer } from "../../api/client";
 import { ExportMenu, ReportViewer, type ReportView } from "../../components/ReportViewer";

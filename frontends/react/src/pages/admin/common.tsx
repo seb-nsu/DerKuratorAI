@@ -13,7 +13,7 @@ const TONES: Record<Kind, [string, string, string]> = {
   error: ["danger", "error", "Error"],
 };
 
-// `code` and **bold** of the Streamlit texts
+// `code` and **bold** of the API texts
 export function Inline({ text }: { text: string }) {
   const parts = text.split("`");
   return (

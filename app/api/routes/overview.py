@@ -1,6 +1,6 @@
 """Overview page: scope line, KPI ribbon and portfolio charts, the top-risk alert bar, a Project Manager's waiting
 proposals and the PMO's management reserve. One route per page section, so a failing section never takes the others
-down (as the Streamlit page's error boundaries). Everything is computed from the caller's scope; a Project Manager
+down. Everything is computed from the caller's scope; a Project Manager
 never learns the size of the whole portfolio."""
 from __future__ import annotations
 

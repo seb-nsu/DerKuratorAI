@@ -1,4 +1,4 @@
-// Display helpers of the Projects and Approvals pages: the same cell formats as the Streamlit tables (whole euros,
+// Display helpers of the Projects and Approvals pages: the same cell formats as the NiceGUI tables (whole euros,
 // dates without midnight) and small blocks (table, dialog, notice). The Approvals cells (verdict, budget Δ,
 // submitted) come formatted from the API. Formatting only – every value comes from the API.
 import { useEffect, useRef, type ReactNode } from "react";

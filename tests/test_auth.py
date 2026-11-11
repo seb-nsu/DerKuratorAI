@@ -6,14 +6,12 @@ import time
 from pathlib import Path
 
 import pytest
-from streamlit.testing.v1 import AppTest
 
 from app.core import auth
 from app.core.runtime_config import update_runtime_config
 from app.core.security import ROLE_PM, ROLE_PMO
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
-MAIN = PROJECT_ROOT / "app" / "main.py"
 DEMO_PASSWORD = json.loads(auth.DEMO_USERS_FILE.read_text(encoding="utf-8"))["public_demo_password"]
 FAST = auth.MIN_ITERATIONS  # the minimum is enforced – tests use it, never fewer
 
@@ -191,107 +189,3 @@ class TestUserFiles:
         with pytest.raises(ValueError, match="max_failed_attempts"):  # pydantic's ValidationError is a ValueError
             EnvFileModel.model_validate({"auth": {"max_failed_attempts": 0}})
         assert EnvFileModel.model_validate({"auth": {"lockout_minutes": 10}})
-
-
-# =========================================================================== UI
-@pytest.fixture
-def ui(tmp_path, monkeypatch):
-    """App with a copy of the demo data (same isolation as the Admin Console UI tests). Yields its own MonkeyPatch for
-    environment variables, undone before the shared teardown rebuilds the runtime config (no PROD leaks)."""
-    import shutil
-
-    from app.core import logs
-    from app.core.config import get_settings
-    from app.core.runtime_config import reset_runtime_config
-
-    shutil.copy(PROJECT_ROOT / "data" / "DerKurator_Demo_Portfolio.json", tmp_path / "portfolio.json")
-    shutil.copy(PROJECT_ROOT / "data" / "supported_models.json", tmp_path / "supported_models.json")
-    env = pytest.MonkeyPatch()
-    for key, value in {"JSON_PATH": tmp_path / "portfolio.json", "DATA_SOURCE": "json", "ENVIRONMENT": "DEV"}.items():
-        env.setenv(key, str(value))
-    monkeypatch.setattr(logs, "DATA_DIR", tmp_path)
-    get_settings.cache_clear()
-    yield env
-    env.undo()
-    get_settings.cache_clear()
-    reset_runtime_config()
-
-
-def _switch_to(env: pytest.MonkeyPatch, environment: str) -> None:
-    from app.core.config import get_settings
-    from app.core.runtime_config import reset_runtime_config
-
-    env.setenv("ENVIRONMENT", environment)
-    get_settings.cache_clear()
-    reset_runtime_config()
-
-
-def _fresh() -> AppTest:
-    import streamlit as st
-
-    st.cache_data.clear()
-    at = AppTest.from_file(str(MAIN), default_timeout=90)
-    at.run()
-    assert not at.exception, at.exception
-    return at
-
-
-def _submit(at: AppTest, user: str, password: str) -> AppTest:
-    at.text_input(key="login_user").input(user)
-    at.text_input(key="login_password").input(password)
-    next(b for b in at.button if b.label == "Sign in").click().run()
-    assert not at.exception, at.exception
-    return at
-
-
-class TestSignInUI:
-    def test_without_sign_in_only_the_sign_in_page_exists(self, ui):
-        at = _fresh()
-        assert [t.value for t in at.title] == ["Sign in"]
-        assert "auth_user" not in at.session_state and not any(b.key == "sign_out" for b in at.button)
-        assert any("Demo environment – demo accounts" in m.value for m in at.markdown)
-
-    def test_quick_button_signs_in_with_one_click(self, ui):
-        at = _fresh()
-        at.button(key="demo_PMO-DEPUTY").click().run()
-        assert at.session_state["auth_user"]["user_id"] == "PMO-DEPUTY"
-        assert at.session_state["login_password"] == ""  # never kept in the session
-
-    def test_wrong_password_stays_on_the_sign_in_page(self, ui):
-        at = _submit(_fresh(), "PMO-ADMIN", "wrong")
-        assert "auth_user" not in at.session_state
-        assert any("Unknown user or wrong password" in w.value for w in at.warning)
-        assert at.text_input(key="login_password").value == ""  # the password is never kept
-
-    def test_role_comes_from_the_user_file_not_from_the_session(self, ui):
-        at = _fresh()
-        at.session_state["role"] = ROLE_PMO  # a forged role in the session must not count
-        at = _submit(at, "Priya Raman", DEMO_PASSWORD)
-        assert at.session_state["role"] == ROLE_PM and at.session_state["user_id"] == "Priya Raman"
-
-    def test_sign_out_returns_to_the_sign_in_page(self, ui):
-        at = _submit(_fresh(), "PMO-ADMIN", DEMO_PASSWORD)
-        at.button(key="sign_out").click().run()
-        assert "auth_user" not in at.session_state and [t.value for t in at.title] == ["Sign in"]
-
-    def test_inactive_session_is_signed_out(self, ui):
-        at = _submit(_fresh(), "PMO-ADMIN", DEMO_PASSWORD)
-        at.session_state["auth_last_activity"] = time.time() - 31 * 60
-        at.run()
-        assert "auth_user" not in at.session_state
-        assert any("session expired" in w.value for w in at.warning)
-
-    def test_prod_with_a_real_user_file_signs_in_without_demo_box(self, ui, tmp_path, monkeypatch, pmo_hash):
-        _user_file(tmp_path, monkeypatch, [{"user_id": "PMO-1", "role": ROLE_PMO, "password_hash": pmo_hash}])
-        _switch_to(ui, "PROD")
-        at = _fresh()
-        assert not any("demo accounts" in m.value for m in at.markdown)
-        at = _submit(at, "PMO-1", "s3cret-pmo")
-        assert at.session_state["auth_user"]["role"] == ROLE_PMO
-        assert any("LIVE PRODUCTION ENVIRONMENT" in e.value for e in at.error)
-
-    def test_prod_with_demo_accounts_does_not_offer_a_sign_in(self, ui):
-        _switch_to(ui, "PROD")
-        at = _fresh()
-        assert any("Sign-in is not configured" in e.value for e in at.error)
-        assert not at.text_input and not any("demo accounts" in m.value for m in at.markdown)

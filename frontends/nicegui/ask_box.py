@@ -23,7 +23,7 @@ from nicegui import app, ui
 from frontends.nicegui import api
 from frontends.nicegui.components import notify
 
-HISTORY = 3  # answers kept per box, as in the Streamlit box
+HISTORY = 3  # answers kept per box, as in the React box
 MAX_CHARS = 600
 API_IDS = ("run_id", "proposal_id", "demand_id", "project_id", "a", "b", "scenario")  # name the box's history
 API_CONTEXT = ("business_unit", "status", "year", "scenarios")  # sent with the question only

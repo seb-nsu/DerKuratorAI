@@ -1,4 +1,4 @@
-// Number formats of the Overview and Data quality pages – the same styles as the Streamlit pages ("€9.92 M",
+// Number formats of the Overview and Data quality pages – the same styles as the NiceGUI pages ("€9.92 M",
 // "€420,000", "85 %"). Display only: every figure itself comes from the API.
 const grouped = (value: number, digits: number) =>
   value.toLocaleString("en-US", { minimumFractionDigits: digits, maximumFractionDigits: digits });

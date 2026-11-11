@@ -250,7 +250,7 @@ class TestScheduleCost:
         assert _eac_change()[0]["new"] > 420000
 
     def test_schedule_slider_stops_at_remaining_duration(self, dataset_factory, project_factory):
-        from app.ui.console import _min_schedule_months
+        from app.views.console import min_schedule_months as _min_schedule_months
 
         short = _short_project_dataset(dataset_factory, project_factory, 3)
         assert _min_schedule_months(short, "P-1001") == -2

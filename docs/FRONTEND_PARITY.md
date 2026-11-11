@@ -1,13 +1,12 @@
 # Front ends: rules and parity list
 
-DerKurator AI has three front ends on the same rules and data:
+DerKurator AI has two front ends on the same rules and data (the former Streamlit front end has been removed):
 
-- **Streamlit** (`app/main.py`) is today's product. It calls the service layer in-process.
-- **NiceGUI** (`frontends/nicegui`, Python) is the prototype of the new UI.
-- **React** (`frontends/react`, TypeScript) is the second new UI.
+- **NiceGUI** (`frontends/nicegui`, Python), the default of `python scripts/serve.py`.
+- **React** (`frontends/react`, TypeScript), the default of the container image.
 
-`FRONTEND=streamlit|nicegui|react` picks the one that serves (`python scripts/serve.py`, also in the container).
-NiceGUI and React talk only to the HTTP API (`app/api`, see `docs/API.md`). Neither holds business logic: approvals,
+`FRONTEND=nicegui|react` picks the one that serves (`python scripts/serve.py`, also in the container).
+Both talk only to the HTTP API (`app/api`, see `docs/API.md`). Neither holds business logic: approvals,
 verdicts and row-level security run only behind the API.
 
 ## When React must follow
@@ -23,30 +22,30 @@ verdicts and row-level security run only behind the API.
    front ends.
 4. **Formatting lives behind the API where a table shows it as is.** The Approvals cells (Verdict with its shape
    symbol, Budget Δ, Submitted) come as `verdict_label`, `budget_delta_label` and `submitted_label` from
-   `app/views/approvals.py`, which Streamlit uses too, so a format fix is made once. The remaining front-end copies
+   `app/views/approvals.py`, so a format fix is made once. The remaining front-end copies
    (`eur` on KPIs and the project table, `cell`) move behind the API step by step, starting with the next page that
    changes anyway.
 
 ## Parity list
 
-| Page | Streamlit | NiceGUI | React | API |
-|---|---|---|---|---|
-| Sign-in (centred card, demo accounts, deep link back) | ✓ | ✓ | ✓ | ✓ |
-| Page frame (navigation per role, scope line, reload, account, dark mode, phone menu; sign-out ends the session on the server, the token is renewed while the user works) | ✓ (no dark mode, no phone menu) | ✓ | ✓ | ✓ (`/auth/refresh`, `/auth/sign-out`) |
-| Overview | ✓ | ✓ | ✓ | ✓ (`own_view`, open items with Due/Deadline columns) |
-| Steering Console (guided + free text, scenario memory off by default, forced simulation, history with Clear history, report viewer with tabs and charts, save / submit / apply with override, exports per report; deep link `?action=&project=`) | ✓ | ✓ | ✓ | ✓ |
-| Approvals (inbox with confirm/override/reject, decided + revert, mine + withdraw, delegations, deputy banner, SLA, escalations, ?proposal= deep link) | ✓ | ✓ (proposal detail in the shared report viewer with exports and "Ask about this report") | ✓ (same) | ✓ |
-| Projects + project detail (filters, ?project=&tab= deep link, all tabs, edit form, report benefit, console buttons) | ✓ | ✓ | ✓ | ✓ (benefit `default_month`) |
-| What-if comparison (A/B with deep link `?a=&b=`, charts, differences, delete) | ✓ | ✓ | ✓ | ✓ |
-| Planning (all sections per role, `?tab=`/`&demand=` deep links, up to three calculated scenarios as client state, question-box prefill) | ✓ | ✓ | ✓ | ✓ |
-| Data quality | ✓ | ✓ | ✓ | ✓ |
-| Navigation per role (`app/views/navigation.py`: PMO Overview, Projects, Steering Console, Approvals, Planning, Rules; PM Overview, My projects, Steering Console, My proposals, My demands; Data quality and What-if comparison as sub-pages with their own URL, opened from Projects and the Steering Console; a PM's scope line without the portfolio total) | ✓ | ✓ | ✓ | ✓ (`parent` of a page, `scope.total` null for a PM) |
-| Decision insights (PMO sub-page of the overview: status check of the sources, portfolio with probabilities, reference class, decision review with audit pack, ServiceNow transfers) | ✓ | ✓ | ✓ | ✓ (`/insights/*`) |
-| Rules (business rules and required fields; every PMO reads, only the PMO Head changes, reset with confirmation) | ✓ | ✓ | ✓ | ✓ (`/governance/*`, `pmo_head` of the workspace user) |
-| Admin Console (System status, Operations, Logs, Developer; all tabs, confirm dialogs, deep link `?tab=<area>.<section>`, sign-in again after an environment switch) | ✓ | ✓ | ✓ (shadow results as plain text, not Markdown) | ✓ |
-| Admin Console › Operations › Notifications (on/off, configured channels without secrets, outbox counts and last error, send test notification) | ✓ | ✓ | ✓ | ✓ (`/admin/notifications`, `/admin/notifications/test`; channel table as `channels`) |
-| Admin Console › System status › Graph backend (configured and active backend, Neo4j reachable, node/relationship counts, last sync, fallback warning; read-only) | ✓ | ✓ | ✓ | ✓ (`graph_backend` of `/admin/status`) |
-| Question box on every page | ✓ | ✓ (`frontends/nicegui/ask_box.py`; hand-over to the Steering Console and Planning picked up there) | ✓ (`src/components/AskBox.tsx`; same) | ✓ (verdict `lead_reason`; pages `project`, `compare`, `demands`, `scenario`) |
+| Page | NiceGUI | React | API |
+|---|---|---|---|
+| Sign-in (centred card, demo accounts, deep link back) | ✓ | ✓ | ✓ |
+| Page frame (navigation per role, scope line, reload, account, dark mode, phone menu; sign-out ends the session on the server, the token is renewed while the user works) | ✓ | ✓ | ✓ (`/auth/refresh`, `/auth/sign-out`) |
+| Overview | ✓ | ✓ | ✓ (`own_view`, open items with Due/Deadline columns) |
+| Steering Console (guided + free text, scenario memory off by default, forced simulation, history with Clear history, report viewer with tabs and charts, save / submit / apply with override, exports per report; deep link `?action=&project=`) | ✓ | ✓ | ✓ |
+| Approvals (inbox with confirm/override/reject, decided + revert, mine + withdraw, delegations, deputy banner, SLA, escalations, ?proposal= deep link) | ✓ (proposal detail in the shared report viewer with exports and "Ask about this report") | ✓ (same) | ✓ |
+| Projects + project detail (filters, ?project=&tab= deep link, all tabs, edit form, report benefit, console buttons) | ✓ | ✓ | ✓ (benefit `default_month`) |
+| What-if comparison (A/B with deep link `?a=&b=`, charts, differences, delete) | ✓ | ✓ | ✓ |
+| Planning (all sections per role, `?tab=`/`&demand=` deep links, up to three calculated scenarios as client state, question-box prefill) | ✓ | ✓ | ✓ |
+| Data quality | ✓ | ✓ | ✓ |
+| Navigation per role (`app/views/navigation.py`: PMO Overview, Projects, Steering Console, Approvals, Planning, Rules; PM Overview, My projects, Steering Console, My proposals, My demands; Data quality and What-if comparison as sub-pages with their own URL, opened from Projects and the Steering Console; a PM's scope line without the portfolio total) | ✓ | ✓ | ✓ (`parent` of a page, `scope.total` null for a PM) |
+| Decision insights (PMO sub-page of the overview: status check of the sources, portfolio with probabilities, reference class, decision review with audit pack, ServiceNow transfers) | ✓ | ✓ | ✓ (`/insights/*`) |
+| Rules (business rules and required fields; every PMO reads, only the PMO Head changes, reset with confirmation) | ✓ | ✓ | ✓ (`/governance/*`, `pmo_head` of the workspace user) |
+| Admin Console (System status, Operations, Logs, Developer; all tabs, confirm dialogs, deep link `?tab=<area>.<section>`, sign-in again after an environment switch) | ✓ | ✓ (shadow results as plain text, not Markdown) | ✓ |
+| Admin Console › Operations › Notifications (on/off, configured channels without secrets, outbox counts and last error, send test notification) | ✓ | ✓ | ✓ (`/admin/notifications`, `/admin/notifications/test`; channel table as `channels`) |
+| Admin Console › System status › Graph backend (configured and active backend, Neo4j reachable, node/relationship counts, last sync, fallback warning; read-only) | ✓ | ✓ | ✓ (`graph_backend` of `/admin/status`) |
+| Question box on every page | ✓ (`frontends/nicegui/ask_box.py`; hand-over to the Steering Console and Planning picked up there) | ✓ (`src/components/AskBox.tsx`; same) | ✓ (verdict `lead_reason`; pages `project`, `compare`, `demands`, `scenario`) |
 
 ## End-to-end tests
 

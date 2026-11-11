@@ -1,4 +1,4 @@
-// Page id -> page component (same ids as the NiceGUI pages and the Streamlit URL paths). A page not yet built shows
+// Page id -> page component (same ids as the NiceGUI pages). A page not yet built shows
 // the placeholder; the parity list in docs/FRONTEND_PARITY.md tracks which ones exist.
 import { type ComponentType } from "react";
 import { DataQuality } from "./DataQuality";

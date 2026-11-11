@@ -5,7 +5,7 @@
     "codespaces": {
       "openFiles": [
         "README.md",
-        "app/main.py"
+        "scripts/serve.py"
       ]
     },
     "vscode": {
@@ -22,15 +22,15 @@
   },
   "updateContentCommand": "[ -f packages.txt ] && sudo apt update && sudo apt upgrade -y && sudo xargs apt install -y <packages.txt; pip3 install --user -r requirements.txt && echo 'Requirements installed'",
   "postAttachCommand": {
-    "server": "streamlit run app/main.py"
+    "server": "FRONTEND=nicegui python3 scripts/serve.py"
   },
   "portsAttributes": {
-    "8501": {
+    "8080": {
       "label": "Application",
       "onAutoForward": "openPreview"
     }
   },
   "forwardPorts": [
-    8501
+    8080
   ]
 }

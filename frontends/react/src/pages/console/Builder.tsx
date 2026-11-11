@@ -14,7 +14,7 @@ type Param = S["ScenarioParam"];
 type Value = boolean | number | string | null | undefined;
 export type RunBody = { request?: string; guided?: { action: string; project: string | null; target: string | null; params: Record<string, Value> } };
 
-const RADIO_PARAMS = new Set(["cost_type", "direction", "is_perc", "method", "funding"]); // radio buttons, as in Streamlit
+const RADIO_PARAMS = new Set(["cost_type", "direction", "is_perc", "method", "funding"]); // radio buttons, as in NiceGUI
 const CALLOUT_NOTES = ["The Data Steward blocks", "This project is blocked", "This project is not on hold"];
 const NO_TRANSFER = "—";
 

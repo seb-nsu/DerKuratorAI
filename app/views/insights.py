@@ -1,7 +1,7 @@
 """Decision insights page (PMO): the independent view on the portfolio that no single source tool gives – status
 check of the sources, the portfolio with probabilities, the reference class of a project, the review of past
 decisions with its hit rate, the audit pack of an approved decision and the transfer of approved changes back to
-ServiceNow. One set of functions for the Streamlit page and the HTTP API; deterministic, no LLM."""
+ServiceNow. One set of functions behind the HTTP API; deterministic, no LLM."""
 from __future__ import annotations
 
 from datetime import date

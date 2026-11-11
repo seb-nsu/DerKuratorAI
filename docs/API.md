@@ -1,9 +1,8 @@
 # HTTP API
 
-The API (`app/api/`, FastAPI) is the back end of the new front ends (NiceGUI, React). It contains no business logic:
-each route checks identity and scope, calls the same modules as the Streamlit pages (pipeline, verdict engine,
-proposal store, shared approval flow `app/approval_flow.py`) and returns JSON. Streamlit keeps calling those modules
-in-process and is unaffected.
+The API (`app/api/`, FastAPI) is the back end of both front ends (NiceGUI, React). It contains no business logic:
+each route checks identity and scope, calls the shared page logic and core modules (`app/views/`, pipeline, verdict
+engine, proposal store, shared approval flow `app/approval_flow.py`) and returns JSON.
 
 ## Start
 
@@ -21,15 +20,15 @@ in `NICEGUI_STORAGE_PATH` (default `data/nicegui`).
 
 ## Sign-in and tokens
 
-`POST /api/v1/auth/token` with `user_id` and `password` checks the same user file and lockouts as the Streamlit
-sign-in and returns a bearer token. The token lasts as long as the session timeout (`auth.session_timeout_minutes`).
+`POST /api/v1/auth/token` with `user_id` and `password` checks the user file and the lockouts per account and
+returns a bearer token. The token lasts as long as the session timeout (`auth.session_timeout_minutes`).
 
 The token carries only the user id, the environment and a session id. The role is read from the user file on every
 request, so a removed or changed account takes effect at once. A token from one environment is invalid in another.
 
 - **Renewal.** `POST /api/v1/auth/refresh` returns a fresh token of the same session while the current one is valid.
   NiceGUI and React call it on their next API call once less than 10 minutes remain, so the session timeout acts on
-  inactivity as in Streamlit. One sign-in is renewed for at most 12 hours.
+  inactivity. One sign-in is renewed for at most 12 hours.
 - **Sign-out.** `POST /api/v1/auth/sign-out` revokes the session: the token and every renewal of it answer 401 from
   then on. The deny-list is held in memory until the last token of the session would have expired.
 - **Where the token lives.** NiceGUI keeps it on the server, behind an `HttpOnly`, `SameSite=Lax` session cookie
@@ -50,7 +49,7 @@ request, so a removed or changed account takes effect at once. A token from one 
 | `GET /steering/guided/{action}?project=` | PMO, PM | The inputs of one guided scenario for a project: defaults, bounds (e.g. the lowest schedule shift), options (teams, skills, risks, phases) and hints |
 | `POST /steering/runs/{run_id}/apply` | PMO, PM | Approve & apply of the latest step when it needs no approval (approval mode `apply`); only manual changes are recorded as a hand-over. A NO-GO needs `override` plus a `comment`; governed changes answer 409 (submit a proposal) |
 | `POST /steering/runs/{run_id}/save` | PMO, PM | Saves the latest step as a what-if for the A/B comparison |
-| `GET /steering/chat`, `DELETE /steering/chat` | PMO, PM | The caller's analysis history (shared with the Streamlit console) with each analysis's status, and whether the next request can build on the latest step (`continuation`, NO-GO starts fresh by default); clear it |
+| `GET /steering/chat`, `DELETE /steering/chat` | PMO, PM | The caller's analysis history (the same in both front ends) with each analysis's status, and whether the next request can build on the latest step (`continuation`, NO-GO starts fresh by default); clear it |
 | `GET /whatifs`, `GET /whatifs/{id}`, `DELETE /whatifs/{id}` | PMO: all, PM: own | Saved what-ifs limited to the caller's current scope; delete by the owner or the PMO (audited) |
 | `GET /whatifs/compare?a=&b=` | PMO: all, PM: own | A/B comparison: key figures, differences, budget impact per project, with the page's charts as Plotly figure JSON |
 | `GET /proposals`, `GET /proposals/{id}` | PMO: all, others: their own | Proposals with deadline state; `?status=submitted` is the PMO inbox (escalated first) |
@@ -115,8 +114,7 @@ request, so a removed or changed account takes effect at once. A token from one 
 
 Every admin route answers 403 for every other role; the System Admin sees settings and logs only, never project data.
 An admin action answers `kind` and `message` (plus its own fields) with 200, or 409 (422 for invalid input) when it
-fails. Actions that discard data or settings need `"confirm": true` in the body and are audited like the Streamlit
-console.
+fails. Actions that discard data or settings need `"confirm": true` in the body and are audited.
 
 Unexpected errors answer 500 with an incident id. The traceback goes only to the system log and
 `data/incidents.jsonl`. LLM costs never appear in these answers; they stay in the Admin Console.
@@ -139,8 +137,8 @@ once.
 Several workers are allowed only for the React front end or the API alone, with `STATE_STORE=file` and the same
 `API_TOKEN_SECRET` (at least 32 characters) in every worker: `scripts/serve.py` with `FRONTEND=react` and
 `WEB_CONCURRENCY=4` then starts four uvicorn workers. Otherwise `scripts/serve.py` and the API refuse to start with
-`WEB_CONCURRENCY` above 1 and name what is missing. NiceGUI and Streamlit keep each user's session in the process that
-holds its websocket, so they always run in one process; scale them with several replicas behind a load balancer with
+`WEB_CONCURRENCY` above 1 and name what is missing. NiceGUI keeps each user's session in the process that holds its
+websocket, so it always runs in one process; scale it with several replicas behind a load balancer with
 sticky sessions (see `docs/PILOT_OPERATIONS.md`, "Several users at once"). The file store suits one host or a shared
 volume with a few replicas; a network store (e.g. Redis or Postgres) behind the same interface is the production option
 for many replicas, it is not part of the pilot.

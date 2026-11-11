@@ -1,6 +1,6 @@
 """Global system logging (data/app.log) and file helpers for audit, shadow and system logs.
 
-- All loggers at INFO and above (including Streamlit) are appended continuously to data/app.log.
+- All loggers at INFO and above are appended continuously to data/app.log.
   The file rotates at 5 MB (3 backups) so it does not grow without bound.
 - Every line carries the active environment (DEV/TEST/PROD).
 - Read helpers deliberately re-raise FileNotFoundError – the UI then shows "No entries".
@@ -89,7 +89,7 @@ def shutdown_logging() -> None:
 
 
 def setup_logging(level: int = logging.INFO, log_file: Path | None = None) -> None:
-    """Idempotent (Streamlit re-runs the script on every interaction)."""
+    """Idempotent (every front end and test may call it again)."""
     root = logging.getLogger()
     if get_app_log_handler() is not None:
         return
@@ -103,16 +103,6 @@ def setup_logging(level: int = logging.INFO, log_file: Path | None = None) -> No
         root.addHandler(console)
     root.setLevel(level)
 
-    # Streamlit loggers do not propagate to the root logger, so attach the file handler directly and set them
-    # explicitly to INFO (Streamlit assigns levels per logger from its config; the default would be WARNING).
-    logging.getLogger("streamlit").setLevel(logging.INFO)
-    for name, obj in list(logging.root.manager.loggerDict.items()):
-        if not isinstance(obj, logging.Logger) or name.split(".")[0] != "streamlit":
-            continue
-        if name.startswith("streamlit") and obj.level > logging.INFO:
-            obj.setLevel(logging.INFO)
-        if not obj.propagate:
-            obj.addHandler(handler)
     for name in _NOISY_LOGGERS:
         logging.getLogger(name).setLevel(logging.WARNING)
     logging.captureWarnings(True)

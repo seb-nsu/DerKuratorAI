@@ -1,4 +1,4 @@
-"""Display helpers of the Projects and Approvals pages: the same cell formats as the Streamlit tables (whole euros,
+"""Display helpers of the Projects and Approvals pages: the same cell formats as the React tables (whole euros,
 dates without midnight) and small table and dialog blocks. The Approvals cells (verdict, budget Δ, submitted) come
 formatted from the API. Formatting only – every value comes from the API."""
 from __future__ import annotations

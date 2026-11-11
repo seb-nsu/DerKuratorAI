@@ -1,16 +1,12 @@
-"""HTTP API before real use of the new front ends: sign-out on the server, token renewal, the limit on calculations,
-when several server processes are allowed, the NiceGUI session cookie and the API's independence from the Streamlit package."""
+"""HTTP API before real use of the front ends: sign-out on the server, token renewal, the limit on calculations,
+when several server processes are allowed and the NiceGUI session cookie."""
 from __future__ import annotations
-
-import subprocess
-import sys
 
 import pytest
 from fastapi import HTTPException
 
 from app.api import limits, state_store, tokens
 from app.api.main import create_app
-from app.core.config import PROJECT_ROOT
 from app.views.approvals import shown_cells
 from tests import test_api
 from tests.test_api import ERP, PM, PMO, sign_in
@@ -99,9 +95,8 @@ class TestServerProcesses:
         monkeypatch.setenv("STATE_STORE", "file")
         monkeypatch.setenv("API_TOKEN_SECRET", "x" * 32)
         assert serve.workers("react") == 4
-        for frontend in ("nicegui", "streamlit"):
-            with pytest.raises(SystemExit, match="exactly one server process"):
-                serve.workers(frontend)
+        with pytest.raises(SystemExit, match="exactly one server process"):
+            serve.workers("nicegui")
         monkeypatch.setenv("STATE_STORE", "redis")
         with pytest.raises(SystemExit, match="STATE_STORE must be one of"):
             serve.workers("react")
@@ -121,12 +116,6 @@ def test_nicegui_session_cookie_is_secure_in_prod(monkeypatch):
     assert session_cookie() == {"https_only": False}
     update_runtime_config(environment="PROD")
     assert session_cookie() == {"https_only": True}
-
-
-def test_api_does_not_import_the_streamlit_package():
-    code = "import sys, app.api.main; print(sorted(m for m in sys.modules if m == 'streamlit' or m.startswith('app.ui')))"
-    out = subprocess.run([sys.executable, "-c", code], cwd=PROJECT_ROOT, capture_output=True, text=True, check=True)
-    assert out.stdout.strip().splitlines()[-1] == "[]"
 
 
 def test_approvals_cells_are_formatted_once():

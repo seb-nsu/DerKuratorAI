@@ -12,7 +12,7 @@ What makes it different: **the AI never decides and never calculates.** Every nu
 tools and a dependency graph; every verdict comes from a rule engine configured by the PMO. The language models only
 understand the request, orchestrate the tools and explain the result.
 
-> Version 1.6.0 (see CHANGELOG) · Python 3.14 · Streamlit, NiceGUI and React · Anthropic/OpenAI SDK · NetworkX · 1,428 automated tests
+> Version 1.6.0 (see CHANGELOG) · Python 3.14 · NiceGUI and React · Anthropic/OpenAI SDK · NetworkX · 1,336 automated tests
 
 ---
 
@@ -136,35 +136,34 @@ Copy-Item .env.example .env           # macOS/Linux: cp .env.example .env
 #    add at least one API key (OPENAI_API_KEY, ANTHROPIC_API_KEY or GOOGLE_API_KEY)
 #    – or none at all: the app then runs in deterministic offline mode
 
-# 4. Run
-streamlit run app/main.py
+# 4. Run (NiceGUI front end)
+python scripts/serve.py
 ```
 
-Open **http://localhost:8501**. The app binds to localhost only and sends no usage statistics. The graph database is
+Open **http://127.0.0.1:8080** (`HOST`/`PORT` change it). The app binds to localhost only. The graph database is
 built automatically on first access from the bundled test portfolio (`data/DerKurator_Demo_Portfolio.json`).
 
-**Front ends.** Besides Streamlit there are two new front ends on the same rules and data: **NiceGUI** (Python) and
-**React** (TypeScript). Both talk only to the HTTP API (`app/api`, FastAPI; routes, sign-in and limits in
-[`docs/API.md`](docs/API.md)), which runs in the same process. `FRONTEND=streamlit|nicegui|react` picks the one that
-serves, `python scripts/serve.py` starts it (also the container's command):
+**Front ends.** There are two front ends on the same rules and data: **NiceGUI** (Python, the default of
+`scripts/serve.py`) and **React** (TypeScript, the default of the container image). Both talk only to the HTTP API
+(`app/api`, FastAPI; routes, sign-in and limits in [`docs/API.md`](docs/API.md)), which runs in the same process.
+`FRONTEND=nicegui|react` picks the one that serves, `python scripts/serve.py` starts it (also the container's command):
 
 ```powershell
-$env:FRONTEND = "nicegui"; python scripts/serve.py    # macOS/Linux: FRONTEND=nicegui python scripts/serve.py
+$env:FRONTEND = "react"; python scripts/serve.py    # macOS/Linux: FRONTEND=react python scripts/serve.py
 ```
 
-NiceGUI and React answer on **http://127.0.0.1:8080** (`HOST`/`PORT` change it), Streamlit keeps 8501. React needs
-Node.js 22 once to build (`cd frontends/react; npm ci; npm run build`). On Windows the files `start_streamlit.bat`,
-`start_nicegui.bat` and `start_react.bat` in the repository root do all of this and open the browser. The server runs
+React needs Node.js 22 once to build (`cd frontends/react; npm ci; npm run build`). On Windows the files `Start.bat`
+(NiceGUI), `start_nicegui.bat` and `start_react.bat` in the repository root do all of this and open the browser. The server runs
 in one process; only React may run several workers (`WEB_CONCURRENCY`), with `STATE_STORE=file` and an
 `API_TOKEN_SECRET` (see `docs/API.md`, "Limits"). The container image (`Dockerfile`, `docker-compose.yml`) serves each
-of the three front ends; how to run it and what was verified is in `docs/PILOT_OPERATIONS.md`, "Container". In PROD
+of the two front ends; how to run it and what was verified is in `docs/PILOT_OPERATIONS.md`, "Container". In PROD
 set `API_TOKEN_SECRET` and, for NiceGUI,
 `NICEGUI_STORAGE_SECRET` (each at least 32 characters). What each front end covers, and the rules for keeping them in
 step, are in [`docs/FRONTEND_PARITY.md`](docs/FRONTEND_PARITY.md).
 
 **Sign in.** In DEV and TEST the sign-in page lists the demo accounts (`data/demo_users.json`) with their public
 demo password `kurator-demo`; a button there signs you in as that account. To switch identity, sign out and sign in
-again. The navigation follows the role (one list for all three front ends, `app/views/navigation.py`): the PMO has
+again. The navigation follows the role (one list for both front ends, `app/views/navigation.py`): the PMO has
 Overview, Projects, Steering Console, Approvals, Planning and Rules; a project manager has Overview, My projects,
 Steering Console, My proposals and My demands. Data quality opens from Projects, the What-if comparison from the
 Steering Console. A project's detail page has its own link (`?project=<project number>`), opened only within the
@@ -187,8 +186,8 @@ data – put no API key into the Secrets of a public demo. For a private admin, 
 (at least 12 characters) in `.env` or in the Secrets and sign in as `ADMIN` with that password (another user id via
 `AUTH_ADMIN_USER`). The password is hashed in memory and never written to a file. Alternatively create a hashed entry
 with `python scripts/hash_password.py "<your admin id>" "System Admin"` and set
-`AUTH_EXTRA_USERS` to the file path or to the JSON `{"users": [ ... ]}` itself (on Streamlit Community Cloud: a line
-in the app's Secrets). The extra accounts are merged with the demo accounts and must not be demo entries. PROD
+`AUTH_EXTRA_USERS` to the file path or to the JSON `{"users": [ ... ]}` itself (on a hosted demo: a secret
+environment variable of the host). The extra accounts are merged with the demo accounts and must not be demo entries. PROD
 refuses the demo accounts; the Admin Console refuses to switch to PROD while they are active.
 
 **Run the tests**
@@ -216,46 +215,19 @@ python run_tests.py --cov             # the HTML report with coverage
 ```
 
 A **dev container** (`.devcontainer/devcontainer.json`, e.g. for GitHub Codespaces) uses Python 3.14 like CI, installs
-`requirements.txt` and starts the app in TEST and offline mode with the default security settings.
-
-The UI uses a light theme by design (`.streamlit/config.toml`); it does not follow the browser's dark mode.
+`requirements.txt` and starts the NiceGUI front end in TEST and offline mode with the default security settings.
 
 A GitHub Actions pipeline (`.github/workflows/ci-cd-pipeline.yml`) runs on Python 3.14 for every pull request to and
 push to `main`: ruff and the full suite with coverage (overall lower bound 84 %, at least 80 % of the lines a pull
 request changes; `verdict.py` 100 %, `proposals.py` 90 %, `security.py` 93 %), the Neo4j parity tests, the React type
 check and build, the Playwright end-to-end tests against NiceGUI and React, and the **container image**: it is built and
-started once per front end, and inside it the smoke test (`scripts/smoke_test.py`) starts the app headless in TEST and
-offline mode, checks health, the sign-in page and a demo sign-in, and logs no traceback.
+started once per front end in TEST and offline mode, and `scripts/container_smoke.py` checks health, the sign-in page
+and a demo sign-in.
 
 To save Actions minutes, documentation-only changes and draft pull requests use no minutes, a pull request runs the
 Neo4j, React, end-to-end and container jobs only when their files changed, and a push to `main` (the merge of an
 already tested pull request) runs only the suite and the container image. *Actions > CI/CD Pipeline > Run workflow*
 starts all jobs by hand.
-
-## Deployment (demo on Streamlit Community Cloud)
-
-The hosted demo runs in **TEST** and **offline mode** – no API key, no LLM costs. Data changes (approvals, edits) live
-only in the running instance and reset on restart. Steps that only the repository owner can do:
-
-1. Connect [Streamlit Community Cloud](https://share.streamlit.io) to the GitHub account.
-2. Create the app: repository `<your-account>/DerKurator-AI`, branch `main`, file `app/main.py`, Python 3.12 (Advanced
-   settings).
-3. Secrets (App settings → Secrets, never in the repo):
-   ```toml
-   ENVIRONMENT = "TEST"
-   FORCE_OFFLINE_MODE = "true"
-   ```
-4. Optional: add your own admin account as `AUTH_ADMIN_PASSWORD = "…"` in the Secrets (see "Admin account" above).
-   The demo accounts already include `DEMO-ADMIN` for reviewers.
-5. Share the URL with the reviewers. The sign-in page shows the demo accounts. A private repository makes the app private
-   by default; then invite the viewers by e-mail, or make the app public on purpose.
-6. Before a demo session, open the app once: Community Cloud puts apps to sleep after 12 hours without traffic.
-
-The demo is shared: all visitors who sign in with the same demo account see the same inbox, chats and scenarios. The
-application log is also written to the console, so on Community Cloud it appears in the app's log as well, visible
-to the repository owner.
-
-A live LLM demo needs its own API key with a hard spend limit in the provider console – a product-owner decision.
 
 ## Deployment (demo on Render, Blueprint)
 
@@ -273,8 +245,11 @@ demos.
 Every push to that branch deploys again (`autoDeployTrigger: commit`). On the **free** plan the service sleeps after
 15 minutes without traffic (the next visit waits about a minute; open it before a demo session) and its file system
 is ephemeral: a spin-down, restart or deploy brings the demo back to the bundled portfolio. A paid plan
-(`plan: 0.5c-512mb`, or `1c-2g` for more memory) has no sleep. `FRONTEND: nicegui` or `react` switches the front end;
-change `healthCheckPath` to `/api/v1/health` with it.
+(`plan: 0.5c-512mb`, or `1c-2g` for more memory) has no sleep. `FRONTEND: react` (default) or `nicegui` switches the
+front end; both answer the health check at `/api/v1/health`.
+
+The demo is shared: all visitors who sign in with the same demo account see the same inbox, chats and scenarios. A live
+LLM demo needs its own API key with a hard spend limit in the provider console – a product-owner decision.
 
 ## Deployment (public demo with Docker)
 
@@ -302,7 +277,7 @@ port.
 - `.env.demo` holds no API keys and is never committed; never pass your development `.env` to a public demo.
 - The container has no volume on purpose: a restart keeps the changes, a recreate drops them. Within a running
   instance the Admin Console's **Reset demo data** does the same (needs `AUTH_ADMIN_PASSWORD`).
-- `FRONTEND=nicegui` or `react` switches the front end; all three serve on the same address.
+- `FRONTEND=nicegui` or `react` switches the front end; both serve on the same address.
 - One replica only (what-if runs and the dependency graph are held per process).
 - Local test without a domain: `DEMO_DOMAIN=localhost` (Caddy's own certificate, the browser warns once).
 - The demo password is public; for a closed reviewer group enable `basic_auth` in `deploy/Caddyfile`. Caddy sends
@@ -325,7 +300,7 @@ The internal hosting template (`docker-compose.yml`, PROD with real accounts beh
 | `SERVICENOW_MAPPING_FILE` | Mapping for `servicenow` (default `data/mappings/servicenow_spm.yaml`) |
 | `AUTH_ADMIN_PASSWORD`, `AUTH_ADMIN_USER` | Simple admin account (password ≥ 12 characters, user id default `ADMIN`) |
 | `API_TOKEN_SECRET` | Signing secret of the HTTP API tokens (≥ 32 characters; required in PROD, see `docs/API.md`) |
-| `FRONTEND` | `streamlit` (default), `nicegui` or `react` for `python scripts/serve.py`, the `start_*.bat` files and the container (see `docs/FRONTEND_PARITY.md`) |
+| `FRONTEND` | `nicegui` (default of `python scripts/serve.py`) or `react` (default of the container image); also set by the `start_*.bat` files (see `docs/FRONTEND_PARITY.md`) |
 | `STATE_STORE`, `WEB_CONCURRENCY` | Where the API keeps what-if runs, sign-outs and calculation counters: `memory` (default, one process) or `file` (`data/state/api/`, shared by several workers or replicas on one volume); number of server processes, above 1 only for React with `file` (see `docs/API.md`, "Limits") |
 | `NICEGUI_STORAGE_SECRET`, `NICEGUI_STORAGE_PATH` | NiceGUI front end: cookie signing secret (≥ 32 characters, required in PROD) and the folder of its sessions, which hold API tokens (default `data/nicegui`) |
 | `OTEL_EXPORTER_OTLP_ENDPOINT`, `OTEL_EXPORTER_OTLP_HEADERS`, `OTEL_SERVICE_NAME` | Optional OpenTelemetry export (OTLP/HTTP) of spans and metrics to the company's collector – no prompt or answer text. Without it, every LLM call is still logged to `data/llm_calls.jsonl` |
@@ -468,7 +443,7 @@ Any wrong GO is listed at the top of the report and makes the runner exit with a
 
 v1.x is a single-tenant pilot release with local accounts (PBKDF2). The path to production:
 
-1. **Entra ID SSO** – replace the local accounts with Microsoft Entra ID (OIDC, e.g. `st.login`); roles (Project
+1. **Entra ID SSO** – replace the local accounts with Microsoft Entra ID (OIDC); roles (Project
    Manager, PMO, System Admin) come from group claims, never from the client.
 2. **Headless architecture** – the governance core already runs behind a **FastAPI** service with **NiceGUI** and
    **React** front ends (see "Front ends" above). Open: making React the default once parity and the end-to-end tests

@@ -1,7 +1,7 @@
 """Runs the pytest suite from the Admin Console and evaluates the results.
 
 - Starts pytest with the interpreter of the running app (`sys.executable -m pytest`) instead of a `pytest`
-  on the PATH, which is not necessarily set when the app is started via `.venv\\Scripts\\streamlit.exe`.
+  on the PATH, which is not necessarily set when the app is started via `scripts/serve.py` from a virtual environment.
 - Besides the HTML report, produces a JUnit XML from which the UI builds a native results table
   (the pytest-html report renders its table via JavaScript).
 - Parallel runs are rejected (one run per process).

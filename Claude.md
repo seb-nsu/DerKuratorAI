@@ -14,8 +14,9 @@
   `app/graph/backends.py` with a parity case in `tests/test_graph_backends.py`. NetworkX stays the default; demo,
   tests and CI need no Neo4j and no Docker. Docker only packages the app (`Dockerfile`; `docker-compose.yml`
   internal, `docker-compose.demo.yml` and `render.yaml` public demo).
-- UI: Streamlit; entry point `app/main.py`. Every page except sign-in requires a signed-in identity
-  (`app/core/auth.py`); the role comes from the user file only.
+- UI: NiceGUI (`frontends/nicegui`) and React (`frontends/react`), both only over the HTTP API (`app/api`, page logic
+  in `app/views`); start with `scripts/serve.py` (`FRONTEND=nicegui|react`). Streamlit is gone; do not reintroduce it.
+  Every page except sign-in requires a signed-in identity (`app/core/auth.py`); the role comes from the user file only.
 - AI orchestration: an own agent loop on the Anthropic and OpenAI SDKs (`app/llm/`), no agent framework. The LLM
   interprets language; Python tools calculate and the rule-based verdict engine (`app/crew/verdict.py`) decides.
 - Data: every source goes through the mapping layer (`app/data_adapters/mapping.py`, `docs/DATA_MAPPING.md`); a new

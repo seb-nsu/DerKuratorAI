@@ -6,7 +6,7 @@ name: CI/CD Pipeline
 # - on a pull request the jobs neo4j, react, e2e and container run only when their files changed (job `changes`)
 # - a push to main (normally the merge of a pull request that was already tested) runs only `test` and
 #   `container`; the full set can be started by hand at any time (Actions > CI/CD Pipeline > Run workflow)
-# - the former job `smoke` is gone: `container` starts the same app and runs scripts/smoke_test.py inside the image
+# - the former job `smoke` is gone: `container` starts each front end and signs in with a demo account
 on:
   pull_request:
     branches: [main]
@@ -91,7 +91,6 @@ jobs:
               - "frontends/**"
               - "scripts/**"
               - "data/**"
-              - ".streamlit/**"
 
   test:
     name: Test (Continuous Integration)
@@ -345,7 +344,7 @@ jobs:
       - name: Start each front end and check health, sign-in page and a demo sign-in
         # TEST environment, offline, no API keys: the demo accounts are active and no LLM is called
         run: |
-          for frontend in streamlit nicegui react; do
+          for frontend in nicegui react; do
             docker run -d --name "dk-$frontend" -p 8080:8080 -e FRONTEND="$frontend" \
               -e ENVIRONMENT=TEST -e FORCE_OFFLINE_MODE=true derkurator:ci
             state=starting
@@ -357,8 +356,5 @@ jobs:
             echo "$frontend: container $state"
             [ "$state" = healthy ] || { docker logs "dk-$frontend"; exit 1; }
             python3 scripts/container_smoke.py http://127.0.0.1:8080 "$frontend" || { docker logs "dk-$frontend"; exit 1; }
-            if [ "$frontend" = streamlit ]; then  # the demo sign-in of Streamlit (AppTest) inside the container
-              docker exec dk-streamlit python scripts/smoke_test.py || { docker logs dk-streamlit; exit 1; }
-            fi
             docker rm -f "dk-$frontend"
           done

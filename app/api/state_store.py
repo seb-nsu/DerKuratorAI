@@ -58,14 +58,14 @@ def worker_count() -> int:
 
 def several_workers_refused(workers: int, frontend: str | None) -> str | None:
     """Why `workers` server processes cannot serve `frontend` (None: they can). Several workers need the React front
-    end or the API alone (NiceGUI and Streamlit hold every user's session in one process: run replicas behind sticky
+    end or the API alone (NiceGUI holds every user's session in one process: run replicas behind sticky
     sessions instead), the file store, and one token secret for all of them. Raises RuntimeError for an unknown
     STATE_STORE."""
     backend = backend_name()  # an unknown STATE_STORE fails at start-up, not on the first run
     if workers <= 1:
         return None
     head = f"WEB_CONCURRENCY={workers}:"
-    if frontend in ("streamlit", "nicegui"):
+    if frontend == "nicegui":
         return (f"{head} {frontend} holds each user's session in its server process (websocket), so it runs in "
                 "exactly one server process. Run several replicas behind a load balancer with sticky sessions "
                 "instead (docs/PILOT_OPERATIONS.md, \"Several users at once\").")

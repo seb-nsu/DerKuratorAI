@@ -1,4 +1,4 @@
-"""Report exports, as the Streamlit export menu offers them: the SteerCo Pack (one-page HTML, print to PDF in the
+"""Report exports, as the export menu offers them: the SteerCo Pack (one-page HTML, print to PDF in the
 browser), the analysis as Markdown and its changes as CSV – of a what-if run of the caller or of a proposal the caller
 may see. Everything reads the caller's scope (projects outside it appear as one neutral node); each download is
 audited."""

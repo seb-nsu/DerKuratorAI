@@ -1,7 +1,7 @@
-"""System Admin console logic without Streamlit: every action validates, writes, audits and answers an Outcome; every
-reader returns plain rows. The Streamlit console (app/ui/admin_ui.py) and the admin API routes (app/api/routes/admin*)
-both call these functions, so an action is audited the same way from either front end. Caches of a front end (the
-Streamlit data cache, the API data cache) are cleared by the caller."""
+"""System Admin console logic independent of any front end: every action validates, writes, audits and answers an Outcome; every
+reader returns plain rows. The admin API routes (app/api/routes/admin*) call these functions, so an action is audited
+the same way from either front end. Caches (the API data cache) are
+cleared by the caller."""
 from __future__ import annotations
 
 import json

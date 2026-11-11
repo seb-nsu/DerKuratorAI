@@ -17,7 +17,7 @@ from app.data_adapters import PortfolioDataset, get_data_provider
 from app.graph.portfolio_graph import current_source_fingerprint
 
 _bearer = HTTPBearer(auto_error=False)
-DATA_TTL_S = 60.0  # the same window as the Streamlit pages' data cache
+DATA_TTL_S = 60.0  # how long the data cache serves a dataset before it checks the source again
 _data_lock = threading.Lock()
 _data_cache: dict = {}
 

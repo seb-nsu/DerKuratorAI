@@ -1,11 +1,10 @@
 # DerKurator AI – pinned dependencies (verified against the test environment, Python 3.14.6; also passes on 3.12).
 # Every package the code imports is pinned to the exact version the test suite passed with.
 
-# UI
-streamlit==1.64.0
+# Charts (Plotly figure JSON for both front ends)
 plotly==7.1.0
 
-# HTTP API for the new front ends (app/api)
+# HTTP API for the front ends (app/api)
 fastapi==0.142.2
 uvicorn==0.54.0
 httpx==0.28.1  # NiceGUI calls the API in-process; API tests

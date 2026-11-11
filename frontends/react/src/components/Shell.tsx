@@ -1,5 +1,5 @@
 // The page frame: sign-in guard, header (navigation of the role, light/dark, reload, account), the scope line and the
-// page body. On a phone the navigation collapses into a menu. Same rules as the NiceGUI and Streamlit frames.
+// page body. On a phone the navigation collapses into a menu. Same rules as the NiceGUI frame.
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { api, ApiError, session, type Answer } from "../api/client";

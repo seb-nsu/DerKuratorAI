@@ -2,7 +2,7 @@
 scenario and their choices, the tables of a calculated scenario, the Portfolio Board's landing figures, the report
 choices and the writes of the page (assessment, weight change, draft scenario, plan decision).
 
-Shared by the Streamlit page (app/ui/planning_ui.py) and the HTTP API (app/api/routes/planning.py). All figures come
+Used by the HTTP API (app/api/routes/planning.py). All figures come
 from app/planning – deterministic."""
 from __future__ import annotations
 
@@ -230,7 +230,7 @@ def build_scenario_input(name: str, year_from: int, year_to: int, budget_factor_
 def check_scenario_choices(ds: PortfolioDataset, year_from: int, year_to: int, budget_factor_pct: float,
                            scope: str | None, forced: list[str], excluded: list[str], later: list[str],
                            earlier: list[str], method: str) -> None:
-    """The choices the Streamlit inputs offer, checked for a client that sends them itself. Raises ValueError."""
+    """The choices the planning inputs offer, checked for a client that sends them itself. Raises ValueError."""
     first, last = horizon()
     (from_low, from_high), (to_low, to_high) = year_bounds(first, last)
     if not from_low <= year_from <= from_high or not to_low <= year_to <= to_high:

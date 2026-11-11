@@ -9,7 +9,7 @@ from nicegui import ui
 
 from frontends.nicegui import api
 
-RADIO_PARAMS = {"cost_type", "direction", "is_perc", "method", "funding"}  # shown as radio buttons, as in Streamlit
+RADIO_PARAMS = {"cost_type", "direction", "is_perc", "method", "funding"}  # shown as radio buttons, as in React
 CALLOUT_NOTES = ("The Data Steward blocks", "This project is blocked", "This project is not on hold")
 NO_TRANSFER = "—"
 
@@ -260,7 +260,7 @@ class Builder:
                 .props(f"outlined dense maxlength={spec.get('max_length') or 500}")
 
     def _unit(self, event) -> None:
-        """The value's default and step follow the unit (% or €), as in the Streamlit builder."""
+        """The value's default and step follow the unit (% or €), as in the React builder."""
         self.params["is_perc"] = event.value
         spec = next((p for p in (self.form or {}).get("params") or [] if p["name"] == "value"), None)
         if spec and spec.get("unit_defaults"):

@@ -29,7 +29,7 @@ import { ErrorBox, Icon } from "./ui";
 
 export const CONSOLE_REQUEST_KEY = "dk.console.request";
 export const PLANNING_PREFILL_KEY = "dk.planning.prefill";
-const HISTORY = 3; // answers kept per box, as in the Streamlit box
+const HISTORY = 3; // answers kept per box, as in the NiceGUI box
 const MAX_CHARS = 600;
 
 type Pages = Answer<"/api/v1/assist/pages">;

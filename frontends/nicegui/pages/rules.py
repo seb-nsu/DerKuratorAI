@@ -1,6 +1,6 @@
 """Rules (PMO): the business rules with their bounds and the Data Steward's required fields. They belong to the PMO
-Head, who changes them here; every other PMO account reads them. Same texts and confirmations as the Streamlit and
-React pages; values and actions come from the /governance API, which checks the PMO Head again."""
+Head, who changes them here; every other PMO account reads them. Same texts and confirmations as the React
+page; values and actions come from the /governance API, which checks the PMO Head again."""
 from __future__ import annotations
 
 from functools import partial

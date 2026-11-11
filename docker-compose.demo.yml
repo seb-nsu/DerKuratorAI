@@ -10,7 +10,7 @@ services:
     environment:
       ENVIRONMENT: TEST          # demo accounts on the sign-in page; PROD would refuse them
       FORCE_OFFLINE_MODE: "true" # deterministic offline mode, even if a key reaches the container
-      FRONTEND: ${FRONTEND:-streamlit}
+      FRONTEND: ${FRONTEND:-react}
       HOST: 0.0.0.0
       PORT: "8080"
       AUTH_ADMIN_PASSWORD: ${AUTH_ADMIN_PASSWORD:-}  # optional own admin account (min. 12 characters)

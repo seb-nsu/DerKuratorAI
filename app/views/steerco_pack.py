@@ -18,7 +18,7 @@ from app.crew.shadow import extract_verdict
 from app.crew.verdict import condition_owner_text
 from app.views.exports import CHANGE_COLUMNS, change_rows
 
-VERDICT_STYLES = {  # key -> (label colour, background, streamlit colour)
+VERDICT_STYLES = {  # key -> (label colour, background, colour name)
     "GO": ("#0b6b0b", "#e3f4e3", "green"),
     "CONDITIONAL": ("#8a5a00", "#fff3d6", "orange"),
     "NO-GO": ("#9b1c1c", "#fde4e4", "red"),

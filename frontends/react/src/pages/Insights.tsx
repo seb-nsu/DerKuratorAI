@@ -1,6 +1,6 @@
 // Decision insights (PMO, a sub-page of the overview): status check of the sources, the portfolio with probabilities,
 // the reference class of a project, the review of past decisions with the audit pack and the transfers to ServiceNow.
-// Same sections as the Streamlit page; every figure comes from /api/v1/insights (deterministic, no AI).
+// Same sections as the NiceGUI page; every figure comes from /api/v1/insights (deterministic, no AI).
 import { useState, type ReactNode } from "react";
 import { type Answer } from "../api/client";
 import { download } from "../components/ReportViewer";

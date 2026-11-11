@@ -1,5 +1,5 @@
-"""Change proposals: submit a what-if run, follow its status, the PMO decision (four-eyes, shared flow with the
-Streamlit inbox), withdrawing an own proposal and reverting an approval. An open annual plan (kind `plan`) belongs to
+"""Change proposals: submit a what-if run, follow its status, the PMO decision (four-eyes, shared flow in
+app/approval_flow.py), withdrawing an own proposal and reverting an approval. An open annual plan (kind `plan`) belongs to
 the Portfolio Board and is decided elsewhere; the PMO sees it here only once it is closed (the Decided view), its
 requester always."""
 from __future__ import annotations

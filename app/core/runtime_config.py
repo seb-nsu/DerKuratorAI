@@ -1,8 +1,8 @@
 """Runtime configuration: API keys from .env (memory only), all other settings from the active environment file
 (data/env_<env>.json). Changes via the Admin Console apply immediately and process-wide.
 
-Process-wide and thread-safe on purpose (instead of st.session_state): the shadow crew and background jobs run in worker threads
-and the backend must run without Streamlit. The Admin UI mirrors these values in its session state.
+Process-wide and thread-safe on purpose (instead of per-session state): the shadow crew and background jobs run in worker threads
+and the backend must run without a front end.
 """
 from __future__ import annotations
 

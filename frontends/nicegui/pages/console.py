@@ -1,6 +1,6 @@
 """Steering Console: guided scenario builder or free text (with scenario memory and the PMO's forced simulation), the
 run of a what-if, the analysis history and the report viewer with the actions on a result (export, save as what-if,
-submit for approval, approve & apply or hand over). Same texts and rules as the Streamlit console; every rule and
+submit for approval, approve & apply or hand over). Same texts and rules as the React console; every rule and
 figure comes from the API. Deep link: /console?action=<guided action>&project=<id> opens that guided scenario."""
 from __future__ import annotations
 

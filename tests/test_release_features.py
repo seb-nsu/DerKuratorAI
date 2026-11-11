@@ -13,7 +13,7 @@ from app.core import chat_store, clock, cost_tracker, logs
 from app.core.env_config import env_config_path, load_mcp_config, promote_env_config, save_mcp_config
 from app.core.runtime_config import persist_runtime_config, update_runtime_config
 from app.crew.tools.mcp_client import EnterpriseMCPConnector, MCPConnectorError
-from app.ui import visuals
+from app.views import charts, exports
 
 
 @pytest.fixture
@@ -187,13 +187,13 @@ class TestScenarioVisuals:
     ]
 
     def test_deltas_only_for_numeric_budget_fields(self):
-        deltas = visuals.scenario_deltas(self.CHANGES)
+        deltas = exports.scenario_deltas(self.CHANGES)
         assert list(deltas["delta"]) == [-100000.0, 100000.0]
-        assert visuals.delta_chart(deltas, "€") is not None and visuals.delta_chart(deltas, "FTE") is None
+        assert charts.delta_chart(deltas, "€") is not None and charts.delta_chart(deltas, "FTE") is None
 
     def test_focus_uses_word_boundaries(self):
         meta = {"request": "Stop P-1001", "plan": {"sub_intents": [{"project_ids": ["P-1003"]}]}}
-        assert visuals.focus_projects(meta, {"P-100", "P-1001", "P-1003"}) == ["P-1003", "P-1001"]
+        assert exports.focus_projects(meta, {"P-100", "P-1001", "P-1003"}) == ["P-1003", "P-1001"]
 
     def test_dependency_graph_hides_projects_outside_the_scope(self, dataset):
         deps = pd.DataFrame([{"successor_project_number": "P-1002", "predecessor_project_number": "P-1001",
@@ -201,9 +201,9 @@ class TestScenarioVisuals:
                              {"successor_project_number": "P-1003", "predecessor_project_number": "P-9999",
                               "dependency_type": "Data", "status": "On Track"}])
         dataset.dependencies = deps
-        edges = visuals.dependency_edges(dataset, ["P-1001"])
+        edges = exports.dependency_edges(dataset, ["P-1001"])
         assert len(edges) == 1 and edges.iloc[0]["successor"] == "P-1002"
-        fig = visuals.dependency_graph_figure(dataset, visuals.dependency_edges(dataset, ["P-1003"]), ["P-1003"])
+        fig = charts.dependency_graph_figure(dataset, exports.dependency_edges(dataset, ["P-1003"]), ["P-1003"])
         text = fig.to_json()
         assert "Restricted project" in text and "P-9999" not in text  # outside the user's scope: neither ID nor name
         nodes = fig.data[-1]
@@ -212,26 +212,26 @@ class TestScenarioVisuals:
     def test_dependency_graph_puts_predecessors_left(self, dataset):
         edges = pd.DataFrame([{"successor": "P-1002", "predecessor": "P-1001", "type": "Hard", "status": "At Risk"},
                               {"successor": "P-1003", "predecessor": "P-1002", "type": "Soft", "status": ""}])
-        fig = visuals.dependency_graph_figure(dataset, edges, ["P-1002"])
+        fig = charts.dependency_graph_figure(dataset, edges, ["P-1002"])
         x = dict(zip([t.split("<br>")[0].split(" · ")[0] for t in fig.data[-1].text], fig.data[-1].x, strict=True))
         assert any(" · " in t.split("<br>")[0] for t in fig.data[-1].text)  # RAG as a word next to the shape
         assert x["<b>P-1001</b>"] < x["<b>P-1002</b>"] < x["<b>P-1003</b>"]
         assert fig.data[0].line.color == "#d03b3b"  # the at-risk dependency is red
 
     def test_graph_only_when_analyst_involved(self):
-        assert visuals.wants_dependency_graph({"plan": {"requires_graph_analysis": True}})
-        assert visuals.wants_dependency_graph({}, "3 projects depend on P-1001")
-        assert not visuals.wants_dependency_graph({}, "Budget reduced.")
+        assert exports.wants_dependency_graph({"plan": {"requires_graph_analysis": True}})
+        assert exports.wants_dependency_graph({}, "3 projects depend on P-1001")
+        assert not exports.wants_dependency_graph({}, "Budget reduced.")
 
     def test_report_and_csv_export(self, dataset):
         messages = [{"role": "user", "content": "Transfer budget"},
                     {"role": "assistant", "content": "**Recommendation:** GO",
                      "meta": {"mode": "offline", "duration_s": 1.2, "proposed_changes": self.CHANGES,
                               "request": "=HYPERLINK(\"x\")"}}]
-        report = visuals.build_report_markdown(messages, dataset, "PMO", "PMO-ADMIN", "DEV")
+        report = exports.build_report_markdown(messages, dataset, "PMO", "PMO-ADMIN", "DEV")
         for section in ("# DerKurator AI – Simulation Report", "## 1. Request", "### Proposed changes",
                         "### Before / after (chart data)", "**Recommendation:** GO", "| Project | Change | Current |"):
             assert section in report
         assert "_Mode" not in report and "source_tool" not in report and "runtime" not in report  # no technical fields
-        csv = visuals.changes_csv(messages)
+        csv = exports.changes_csv(messages)
         assert "'=HYPERLINK" in csv and len(csv.strip().splitlines()) == 4

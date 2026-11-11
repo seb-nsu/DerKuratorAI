@@ -115,7 +115,7 @@ user's messages from the outbox; a demo reset archives the outbox with the propo
 
 ## Several users at once
 
-The app runs as one server process by default, whichever front end serves (`FRONTEND=streamlit|nicegui|react`,
+The app runs as one server process by default, whichever front end serves (`FRONTEND=nicegui|react`,
 started with `python scripts/serve.py` or the `start_*.bat` files; see README "Front ends"). Every browser session has
 its own scenario context (no session reads another one's analysis); approvals and writes are serialized by file locks,
 so two PMOs never approve the same proposal twice.
@@ -129,7 +129,6 @@ request takes longer (median about 50 s per request), but sessions do not wait f
 |---|---|---|
 | React | Yes, with `STATE_STORE=file` and one `API_TOKEN_SECRET` | Yes, on one shared data volume with the same two settings; any load balancing |
 | NiceGUI | No (refused) – each user's session lives in the process that holds its websocket | Only behind sticky sessions (the same user always reaches the same replica), one data volume, `STATE_STORE=file`, one `API_TOKEN_SECRET` and one `NICEGUI_STORAGE_SECRET` |
-| Streamlit | No (refused) – same reason | Only behind sticky sessions, one data volume |
 
 With `STATE_STORE=file` the what-if runs, sign-outs and per-user calculation counters of the API are files in
 `data/state/api/` (see `docs/API.md`, "Limits"), so a run started on one worker is answered by another and a
@@ -139,15 +138,14 @@ worker writes to the same `app.log`; when it rotates, a worker may keep writing 
 restart, so ship logs centrally once several workers run. Many replicas on several hosts need a network store (e.g.
 Redis or Postgres) instead of the file store; that is part of the production setup, not of the pilot.
 
-Limits: in Streamlit a browser reload signs the user out (there is no session cookie before SSO); NiceGUI and React
-keep the sign-in across a reload until the session timeout of inactivity. A link to a page or a project (`?project=`)
+Limits: NiceGUI and React keep the sign-in across a reload until the session timeout of inactivity. A link to a page or a project (`?project=`)
 leads to the sign-in and then opens that page. The API allows two calculations (what-if, plan scenario, question box)
 at a time per process, one per user and 20 per user and minute (`API_HEAVY_SLOTS`, `API_HEAVY_PER_MINUTE`); more
 answer "busy, try again". A per-IP limit at the reverse proxy stays advisable.
 
 ## Container
 
-One image serves every front end (`Dockerfile`; `FRONTEND` picks it, Streamlit by default). The data folder lives on
+One image serves both front ends (`Dockerfile`; `FRONTEND` picks it, React by default). The data folder lives on
 a volume, the secrets come from the environment, never from the image:
 
 ```bash
@@ -159,17 +157,17 @@ docker run -d -p 127.0.0.1:8080:8080 --env-file .env -e FRONTEND=react -v derkur
   mount of a host folder must be writable for uid 10001.
 - A named volume keeps its files across image updates – including `env_*.json`, `supported_models.json` and the demo
   portfolio of the first start. Changes to them in a new release are made in the Admin Console or copied in by hand.
-- The health check asks `/_stcore/health` (Streamlit) or `/api/v1/health` (NiceGUI, React) every 30 s after a 30 s
+- The health check asks `/api/v1/health` every 30 s after a 30 s
   start period; `docker ps` shows `healthy` once it answers.
-- The image defaults to `ENVIRONMENT=PROD`: without `AUTH_USERS_FILE` and `API_TOKEN_SECRET` Streamlit and React
-  start but refuse every sign-in, and NiceGUI does not start without `NICEGUI_STORAGE_SECRET`. For a demo, pass
+- The image defaults to `ENVIRONMENT=PROD`: without `AUTH_USERS_FILE` and `API_TOKEN_SECRET` React starts but
+  refuses every sign-in, and NiceGUI does not start without `NICEGUI_STORAGE_SECRET`. For a demo, pass
   `-e ENVIRONMENT=TEST`.
-- Verified 2026-10-07 (Docker 29, image built from this Dockerfile): for each of `streamlit`, `nicegui` and `react`
-  the container became `healthy`, the sign-in page answered HTTP 200 and the demo account `Priya Raman` signed in and
-  saw the Overview in Chromium. With `FRONTEND=react`, `WEB_CONCURRENCY=2`, `STATE_STORE=file` and an
+- Verified 2026-10-07 (Docker 29, image built from this Dockerfile): for each front end the container became
+  `healthy`, the sign-in page answered HTTP 200 and the demo account `Priya Raman` signed in and saw the Overview in
+  Chromium. With `FRONTEND=react`, `WEB_CONCURRENCY=2`, `STATE_STORE=file` and an
   `API_TOKEN_SECRET`, one container ran two workers: six what-ifs, 24 report reads, a proposal and a sign-out spread
   over both without a "run not found"; NiceGUI with `WEB_CONCURRENCY=2`, and React without the file store, refused to
-  start with the reason. CI repeats the build and the three starts in the job "Container image"
+  start with the reason. CI repeats the build and the starts of both front ends in the job "Container image"
   (`scripts/container_smoke.py`), without pushing the image.
 
 ## Dependency graph in Neo4j (optional)

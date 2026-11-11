@@ -1,5 +1,5 @@
 // Pieces the Overview and Data quality pages share: one API answer per section (loading, error box, data) and the
-// small text blocks of the Streamlit pages (caption, info callout, metric).
+// small text blocks of the pages (caption, info callout, metric).
 import { useEffect, useState, type ReactNode } from "react";
 import { api, ApiError } from "../../api/client";
 import { ErrorBox, Icon } from "../../components/ui";

@@ -1,11 +1,10 @@
 """Smoke test of a running container (CI job "Container image"): health, sign-in page and one demo sign-in.
 
-    python scripts/container_smoke.py <base url> <streamlit|nicegui|react>
+    python scripts/container_smoke.py <base url> <nicegui|react>
 
 Run the container in TEST (`-e ENVIRONMENT=TEST -e FORCE_OFFLINE_MODE=true`), so the demo accounts are active. NiceGUI
-and React sign in through the API of the container (POST /api/v1/auth/token, then GET /api/v1/me). Streamlit has no
-HTTP sign-in: this checks its health and start page; the demo sign-in runs inside the container with
-`docker exec <container> python scripts/smoke_test.py` (Streamlit AppTest). Standard library only."""
+and React sign in through the API of the container (POST /api/v1/auth/token, then GET /api/v1/me). Standard library
+only."""
 from __future__ import annotations
 
 import json
@@ -48,13 +47,6 @@ def wait_healthy(url: str) -> None:
 
 def main(base: str, frontend: str) -> None:
     base = base.rstrip("/")
-    if frontend == "streamlit":
-        wait_healthy(f"{base}/_stcore/health")
-        status, body = _request(f"{base}/")
-        if status != 200 or "<html" not in body.lower():
-            raise SystemExit(f"start page: HTTP {status}")
-        print(f"streamlit: health ok, start page HTTP {status}")
-        return
     wait_healthy(f"{base}/api/v1/health")
     status, body = _request(f"{base}/sign-in")
     if status != 200 or "<html" not in body.lower():
@@ -71,6 +63,6 @@ def main(base: str, frontend: str) -> None:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) != 3 or sys.argv[2] not in ("streamlit", "nicegui", "react"):
+    if len(sys.argv) != 3 or sys.argv[2] not in ("nicegui", "react"):
         raise SystemExit(__doc__)
     main(sys.argv[1], sys.argv[2])
