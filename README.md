@@ -16,6 +16,25 @@ understand the request, orchestrate the tools and explain the result.
 
 ---
 
+## My role and key decisions
+
+I am the product owner of this project. The concept, the requirements, the priorities and the acceptance of every
+result are mine; the code was written by AI agents (Claude Code) working to my specification.
+
+| Decision | Why | Where to read it |
+|---|---|---|
+| The AI never decides and never calculates | A steering committee has to be able to audit every number and every verdict | [The "Honest AI" paradigm](#the-honest-ai-paradigm), [ARCHITECTURE.md](ARCHITECTURE.md) |
+| Verdicts come from a rule engine that the PMO configures | Same facts and same rules give the same verdict; thresholds differ per organisation, so none is hard-coded | [`app/crew/verdict.py`](app/crew/verdict.py) |
+| Missing data never passes silently | A missing EAC gives CONDITIONAL GO, an unknown project gives ANALYSIS INCOMPLETE instead of a fake NO-GO | [The "Honest AI" paradigm](#the-honest-ai-paradigm) |
+| Graph database replaced (KùzuDB → NetworkX) | The upstream project is archived and receives no security updates | [ADR-001](docs/adr/ADR-001-graph-database.md) |
+| Streamlit front end removed | NiceGUI and React both run on the same HTTP API; a third front end only added maintenance | [CHANGELOG.md](CHANGELOG.md), [docs/FRONTEND_PARITY.md](docs/FRONTEND_PARITY.md) |
+| Demo portfolio fully invented | A public release must not contain real company data | [docs/DATA_PROTECTION.md](docs/DATA_PROTECTION.md) |
+
+More: [evaluation report](docs/evals/EVAL_REPORT.md) · [pilot operations](docs/PILOT_OPERATIONS.md) ·
+[production roadmap](#production-roadmap) · [version history](CHANGELOG.md)
+
+---
+
 ## The "Honest AI" paradigm
 
 Most AI copilots let a language model produce the numbers and the recommendation – which makes them impossible to
