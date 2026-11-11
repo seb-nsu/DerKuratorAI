@@ -2,22 +2,19 @@
 a model, the reader's scope respected; plus the planning analysis it reads (chain, delay, envelopes, hot spots)."""
 from __future__ import annotations
 
-import json
 from datetime import date
 from pathlib import Path
 
 import pandas as pd
 import pytest
 
-from app.core import logs
 from app.core.security import register_pii_names
 from app.crew import ask as ask_mod
 from app.data_adapters import JsonPortfolioAdapter
 from app.planning import analysis
 from app.planning.scenario import ScenarioInput, run_scenario
-from app.ui import assist_facts
+from app.views import assist_facts
 from tests.llm_fakes import FakeClient, install
-from tests.test_admin_console import _app, app_sandbox  # noqa: F401 - the fixture is used by name
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE = ROOT / "data" / "DerKurator_Demo_Portfolio.json"
@@ -146,72 +143,3 @@ class TestPlanningAnalysis:
     def test_plan_facts_carry_the_rule_based_verdict(self, demo, plan):
         facts = assist_facts.plan_facts(demo, plan)
         assert plan.verdict.label in facts and "Decision per demand" in facts and "critical chains" in facts
-
-
-# --------------------------------------------------------------------------- pages (AppTest, no model)
-def _audit_events(tmp) -> list[dict]:
-    path = Path(logs.AUDIT_LOG)
-    return [json.loads(line) for line in path.read_text().splitlines()] if path.exists() else []
-
-
-class TestPages:
-    @pytest.fixture(autouse=True)
-    def offline(self, monkeypatch):
-        monkeypatch.setenv("FORCE_OFFLINE_MODE", "true")
-
-    def test_planning_analysis_answers_and_audits_without_the_question(self, app_sandbox):  # noqa: F811
-        at = _app("planning")
-        assert "Analysis" in {t.label for t in at.tabs}
-        at.button(key="ask_ex_plan_analysis_0").click().run()
-        assert not at.exception, at.exception
-        assert any("No AI answer available" in m.value for m in at.markdown)
-        events = [e for e in _audit_events(app_sandbox) if e.get("event") == "assistant_question"]
-        assert events and events[-1]["page"] == "plan_analysis" and events[-1]["mode"] == "rules"
-        assert "tightest" not in json.dumps(events[-1])
-
-    def test_pm_demand_detail_has_no_plan_tab(self, app_sandbox):  # noqa: F811
-        at = _app("planning", login="Priya Raman", plan_detail="DMD-2027-001")
-        labels = {t.label for t in at.tabs}
-        assert "Dependencies" in labels and "In the plan" not in labels and "Analysis" not in labels
-
-    def test_pmo_demand_detail_shows_the_plan_position(self, app_sandbox):  # noqa: F811
-        at = _app("planning", plan_detail="DMD-2027-005")
-        assert "In the plan" in {t.label for t in at.tabs}
-        assert any("Base plan (rank order" in m.value for m in at.markdown)
-
-    def test_a_change_question_is_calculated_in_the_box_and_points_to_the_console(self, app_sandbox):  # noqa: F811
-        pid = "PRJ-DEMO-1002"
-        at = _app("projects", detail_pid=pid)
-        at.text_input(key=f"ask_q_project_{pid}").set_value("What if the budget is cut by 20 %?")
-        at.button(key=f"FormSubmitter:ask_form_project_{pid}-Ask").click().run()
-        assert not at.exception, at.exception
-        assert any("Recommendation: NO-GO" in e.value for e in at.error)
-        assert any(b.key == f"ask_console_project_{pid}_0" for b in at.button)
-        events = [e for e in _audit_events(app_sandbox) if e.get("event") == "assistant_question"]
-        assert events[-1]["mode"] == "calculation"
-        at.button(key=f"ask_console_project_{pid}_0").click().run()
-        assert not at.exception, at.exception
-        assert "cut by 20 %? (PRJ-DEMO-1002)" in at.session_state["messages"][0]["content"]
-
-    def test_a_planning_question_is_calculated_and_pre_fills_the_scenarios(self, app_sandbox):  # noqa: F811
-        at = _app("overview")
-        at.text_input(key="ask_q_overview").set_value("What drops out in 2027 at -10 %?")
-        at.button(key="FormSubmitter:ask_form_overview-Ask").click().run()
-        assert not at.exception, at.exception
-        assert any("Recommendation:" in e.value for e in [*at.error, *at.warning, *at.success])
-        at.button(key="ask_plan_overview_0").click().run()
-        assert not at.exception, at.exception
-        assert at.slider(key="scn_factor").value == -10 and at.number_input(key="scn_from").value == 2027
-
-    def test_a_plain_question_is_answered_from_the_facts(self, app_sandbox):  # noqa: F811
-        pid = "PRJ-DEMO-1002"
-        at = _app("projects", detail_pid=pid)
-        at.button(key=f"ask_ex_project_{pid}_0").click().run()
-        assert not at.exception, at.exception
-        assert not any(b.key.startswith(("ask_console_", "ask_handoff_")) for b in at.button)
-
-    def test_overview_briefing(self, app_sandbox):  # noqa: F811
-        at = _app("overview")
-        at.button(key="ask_ex_overview_0").click().run()
-        assert not at.exception, at.exception
-        assert any("Portfolio in your scope" in m.value for m in [*at.markdown, *at.code])

@@ -1,5 +1,5 @@
 """HTTP API of the Admin Console: System Admin only, keys write-only, destructive actions need confirm = true and are
-audited as in the Streamlit console – on a temp copy of the demo portfolio with all logs in the temp folder."""
+audited – on a temp copy of the demo portfolio with all logs in the temp folder."""
 from __future__ import annotations
 
 import json

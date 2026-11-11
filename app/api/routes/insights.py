@@ -1,6 +1,6 @@
 """Decision insights (PMO): status check of the sources, the portfolio with probabilities, the reference class of a
 project, the review of past decisions, the audit pack of an approved decision and the write-back to ServiceNow. The
-same functions as the Streamlit page (app/views/insights.py); deterministic, no LLM."""
+logic lives in app/views/insights.py; deterministic, no LLM."""
 from __future__ import annotations
 
 from typing import Any

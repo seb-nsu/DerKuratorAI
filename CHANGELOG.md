@@ -6,6 +6,14 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the
 
 ## [Unreleased]
 
+### Removed
+- **Streamlit front end.** NiceGUI and React are the only front ends; both run on the HTTP API. Removed: the Streamlit
+  app (`app/main.py`, `app/ui/`), `.streamlit/config.toml`, `start_streamlit.bat`, `scripts/smoke_test.py`, the
+  `streamlit` dependency, the AppTest UI tests and `FRONTEND=streamlit`. The tests of shared helpers now import them
+  from `app/views` directly. `scripts/serve.py` (and `Start.bat`, the dev container) starts NiceGUI by default; the
+  container image, both compose files and `render.yaml` default to React with the health check `/api/v1/health`. The
+  logo moved to `frontends/nicegui/assets/`.
+
 ### Changed
 - **New, fully invented demo portfolio** (`data/DerKurator_Demo_Portfolio.json`/`.xlsx`): new project and demand names, people, teams, portfolios, business units,
   services and project texts; the ServiceNow table layout, the figures and the intentional data-quality cases stay,

@@ -1,5 +1,5 @@
 # Reverse proxy of the public demo (docker-compose.demo.yml): HTTPS via Let's Encrypt for DEMO_DOMAIN, WebSockets
-# (Streamlit, NiceGUI) pass through reverse_proxy unchanged. DEMO_DOMAIN=localhost gives a local test certificate.
+# (NiceGUI) pass through reverse_proxy unchanged. DEMO_DOMAIN=localhost gives a local test certificate.
 {$DEMO_DOMAIN} {
 	encode zstd gzip
 

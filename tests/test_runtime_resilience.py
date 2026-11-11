@@ -106,7 +106,7 @@ class TestPerRequestCosts:
 # =========================================================================== secrets hygiene
 class TestKeyHints:
     def test_no_key_fragment_reaches_the_ui(self):
-        from app.ui.admin_ui import key_hint
+        from app.views.admin import key_hint
 
         assert "…" not in key_hint(True) and key_hint(True) == "Currently set. Leave empty to keep."
 

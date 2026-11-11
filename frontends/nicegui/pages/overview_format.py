@@ -1,4 +1,4 @@
-"""Number formats of the Overview and Data quality pages – the same styles as the Streamlit pages ("€9.92 M",
+"""Number formats of the Overview and Data quality pages – the same styles as the React pages ("€9.92 M",
 "€420,000", "85 %"). Display only: every figure itself comes from the API."""
 from __future__ import annotations
 

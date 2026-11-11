@@ -17,7 +17,7 @@ only when the report has them). Everything comes from the API, already in the ca
 
     await ask_about(card, run_id=… | proposal_id=…)
                                 the report's question box ("Ask about this report", `POST /assist/ask` page "report")
-                                at the end of the card render() returned, as in the Streamlit report
+                                at the end of the card render() returned, as in the React report
     export_menu(base)           the "Export" menu of a report: SteerCo Pack (print / PDF), Markdown, CSV;
                                 base is "/steering/runs/{run_id}" or "/proposals/{id}" (+ /export/{kind})
     await download(path)        fetches a file of the API with the user's token and hands it to the browser

@@ -23,7 +23,6 @@ extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]
 [tool.coverage.run]
 source = ["app"]
 branch = true
-omit = ["app/main.py"]  # Streamlit entry point, covered through AppTest
 
 [tool.coverage.report]
 # Lower bound against regressions, a little below the measured total (86 % on 2026-10-02) so a refactor that removes

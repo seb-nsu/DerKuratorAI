@@ -1,6 +1,6 @@
 """Admin Console – operations: FinOps (LLM costs, Admin only), notifications, ServiceNow sync, write journal, database
 and import report, snapshots, demo reset, purge of a user's data and the in-app system tests. System Admin only;
-destructive actions need confirm = true and are audited as in the Streamlit console."""
+destructive actions need confirm = true and are audited."""
 from __future__ import annotations
 
 import logging

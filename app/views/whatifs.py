@@ -1,5 +1,5 @@
 """What-if comparison: budget impact of a change set, the key figures of a saved what-if, the A/B difference matrix and
-the two charts of the page. Shared by the Streamlit page (app/ui/executive.py) and the HTTP API."""
+the two charts of the page. Used by the HTTP API (app/api/routes/whatifs.py)."""
 from __future__ import annotations
 
 from typing import Any

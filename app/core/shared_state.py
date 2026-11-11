@@ -1,4 +1,4 @@
-"""State that every worker process of the app must see the same way – today the sign-in lockout. A Streamlit app run
+"""State that every worker process of the app must see the same way – today the sign-in lockout. An app run
 with several worker processes (or replicas on one volume) would otherwise count failed sign-ins per process, so an
 attacker could spread attempts across workers. Each state is one small JSON file in data/state/, read and written
 under a cross-process lock; the file is replaced atomically, so a reader never sees half a write."""

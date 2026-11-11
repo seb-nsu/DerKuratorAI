@@ -1,6 +1,6 @@
 // Rules (PMO): the business rules with their bounds and the Data Steward's required fields. They belong to the PMO
-// Head, who changes them here; every other PMO account reads them. Same texts and confirmations as the Streamlit and
-// NiceGUI pages; values and actions come from the /governance API, which checks the PMO Head again.
+// Head, who changes them here; every other PMO account reads them. Same texts and confirmations as the NiceGUI
+// page; values and actions come from the /governance API, which checks the PMO Head again.
 import { useEffect, useState, type ReactElement } from "react";
 import { api, type Answer } from "../api/client";
 import { useWorkspace } from "../components/Shell";

@@ -1,6 +1,6 @@
 """System Admin Console: system status, operations (snapshots, database, notifications, environment staging), logs and
 the developer tools (models and shadowing, MCP, FinOps, shadow logs, in-app system tests). Same areas, texts and
-confirmations as the Streamlit console; every value and action comes from the /admin API. Deep link:
+confirmations as the React console; every value and action comes from the /admin API. Deep link:
 /admin?tab=<area> or ?tab=<area>.<section>, e.g. ?tab=developer.models."""
 from __future__ import annotations
 

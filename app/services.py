@@ -1,4 +1,4 @@
-"""Service layer between the UI and the analysis core: the one place the Streamlit pages call into the crew, the
+"""Service layer between the UI and the analysis core: the one place the API calls into the crew, the
 tools and the graph. The imports are lazy, so a page loads without pulling in the LLM stack, and a test that patches
 the function at its home module still reaches it through here."""
 from __future__ import annotations

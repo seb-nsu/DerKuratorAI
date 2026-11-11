@@ -10,7 +10,7 @@ from app.core.security import ROLE_PM, ROLE_PMO
 from app.crew.pipeline import run_steering_pipeline, scenario_memory_md
 from app.crew.scenarios import build_guided_scenario
 from app.crew.tools import context as ctx
-from app.ui import executive
+from app.views import projects, whatifs
 
 NAMES = {"P-1001": "Alpha Platform", "P-1002": "Beta Billing", "P-1003": "Gamma Governance"}
 
@@ -106,7 +106,7 @@ class TestScenarioStore:
 # =========================================================================== executive helpers
 class TestExecutiveHelpers:
     def test_budget_impact_from_changes_and_stops(self, dataset):
-        impact = executive.budget_impact(CHANGES_A + CHANGES_B + [
+        impact = whatifs.budget_impact(CHANGES_A + CHANGES_B + [
             {"project_id": "P-1002", "field": "budget_cost_eur", "old": 720000, "new": 700000},  # chained step
             {"project_id": "P-1003", "field": "state", "old": "Work in Progress", "new": "On Hold"},  # no budget effect
         ], dataset.projects)
@@ -116,14 +116,14 @@ class TestExecutiveHelpers:
         a = {"name": "A", "verdict": {"label": "GO"}, "changes": CHANGES_A, "budget_impact": {"P-1002": -80000}, "turns": ["x"]}
         b = {"name": "B", "verdict": {"label": "NO-GO"}, "changes": CHANGES_A + CHANGES_B,
              "budget_impact": {"P-1002": -80000, "P-1001": -182000}, "turns": ["x", "y"]}
-        sa, sb = executive.scenario_summary(a), executive.scenario_summary(b)
-        assert sa["Net budget impact"] == "−€80,000" and sb["Projects stopped"] == 1 and sb["Steps"] == 2
-        frame = executive.compare_frame(a, b)
+        sa, sb = whatifs.scenario_figures(a), whatifs.scenario_figures(b)
+        assert sa["net_budget_impact"] == -80000 and sb["projects_stopped"] == 1 and sb["steps"] == 2
+        frame = whatifs.compare_frame(a, b)
         assert frame[frame["project"] == "P-1001"]["differs"].tolist() == ["≠"]
         assert frame[frame["project"] == "P-1002"]["differs"].tolist() == [""]
-        fig = executive.waterfall_figure(b, "B")
+        fig = whatifs.waterfall_figure(b, "B")
         assert fig is not None and list(fig.data[0].x) == ["P-1001", "P-1002", "Net impact"]
-        assert executive.waterfall_figure({"budget_impact": {}}, "x") is None
+        assert whatifs.waterfall_figure({"budget_impact": {}}, "x") is None
 
     def test_cockpit_frames(self, dataset):
         dataset.dependencies = pd.DataFrame([
@@ -133,12 +133,12 @@ class TestExecutiveHelpers:
              "status": "On Track", "required_by_date": pd.Timestamp("2029-01-01"), "description": "secret"},
         ])
         project = dataset.project_view().iloc[0].to_dict()
-        deadlines = executive.cockpit_deadlines("P-1001", project, dataset, today=pd.Timestamp("2030-06-01").date())
+        deadlines = projects.cockpit_deadlines("P-1001", project, dataset, today=pd.Timestamp("2030-06-01").date())
         assert deadlines["type"].tolist() == ["Needs from", "Delivers to", "Project end"]
         assert deadlines.iloc[0]["item"] == "Restricted project" and deadlines.iloc[1]["days"] == -31
-        incoming, outgoing = executive.cockpit_dependencies("P-1001", dataset)
-        assert incoming.iloc[0]["description"] == executive.RESTRICTED_NOTE and outgoing.iloc[0]["project"].startswith("P-1002")
+        incoming, outgoing = projects.cockpit_dependencies("P-1001", dataset)
+        assert incoming.iloc[0]["description"] == projects.RESTRICTED_NOTE and outgoing.iloc[0]["project"].startswith("P-1002")
         assert incoming.iloc[0]["type"] == "–" and "P-9999" not in incoming.to_string()
-        curve = executive.cockpit_cost_curve("P-1001", dataset)
+        curve = projects.cockpit_cost_curve("P-1001", dataset)
         assert list(curve.columns) == ["month", "Planned (cumulative)", "Actual (cumulative)"] and len(curve) == 1
         assert curve.iloc[0]["Planned (cumulative)"] == 420000 and curve.iloc[0]["Actual (cumulative)"] == 238000

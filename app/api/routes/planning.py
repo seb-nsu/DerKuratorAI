@@ -1,6 +1,6 @@
 """Planning: demands and their assessment, plan scenarios against the budget envelopes and capacity limits, and the
-annual plan the Portfolio Board approves – the same modules as the Streamlit Planning page (app/views/planning.py,
-app/planning/).
+annual plan the Portfolio Board approves – the logic lives in app/views/planning.py and
+app/planning/.
 
 Visibility as on the page: a Project Manager sees only the demands they own (no rank, no plan position); the PMO and
 the Portfolio Board see everything. The PMO assesses, calculates and saves scenarios, submits weight changes and
@@ -97,7 +97,7 @@ def board(user: User = Depends(data_user)) -> User:
 
 
 def _refused(exc: Exception, what: str) -> HTTPException:
-    """A refused planning action as the answer the Streamlit page shows as its error message."""
+    """A refused planning action as the answer the page shows as its error message."""
     if isinstance(exc, WriteNotAuthorizedError):
         code = status.HTTP_403_FORBIDDEN
     elif isinstance(exc, DataConflictError | ProposalError | approval.PlanError):

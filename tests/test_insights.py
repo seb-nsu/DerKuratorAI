@@ -1,4 +1,4 @@
-"""Decision insights over the HTTP API and on the Streamlit page: PMO only; status check, forecast, reference class,
+"""Decision insights over the HTTP API: PMO only; status check, forecast, reference class,
 decision review, audit pack (audited) and the ServiceNow transfer that is refused while write-back is off."""
 from __future__ import annotations
 

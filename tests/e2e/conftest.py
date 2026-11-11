@@ -1,6 +1,6 @@
 """End-to-end fixtures: one app server per front end (NiceGUI, React) for the whole session, one Chromium for all, a
 fresh browser context per signed-in user. Every test runs against both front ends with the same selectors – visible
-labels and ARIA roles, which both front ends share with Streamlit.
+labels and ARIA roles, which both front ends share.
 
 Run: `pytest -m e2e` (excluded from the default run). Needs Playwright with Chromium and, for React, the build in
 frontends/react/dist; without them the tests are skipped. PLAYWRIGHT_CHROMIUM points to a Chromium binary (else

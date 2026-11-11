@@ -1,5 +1,5 @@
-"""What-if comparison: saved what-ifs (PMO: all, Project Manager: their own), the A/B comparison with the same charts
-as the Streamlit page (Plotly figure JSON) and deleting a saved what-if. A saved what-if shows only the projects of
+"""What-if comparison: saved what-ifs (PMO: all, Project Manager: their own), the A/B comparison with its charts
+(Plotly figure JSON) and deleting a saved what-if. A saved what-if shows only the projects of
 the reader's current scope."""
 from __future__ import annotations
 

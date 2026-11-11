@@ -12,7 +12,7 @@
 //   status   badge next to the verdict { label, tone, icon }; default: report.status when present
 //   title    the bold request line; default: report.request or report.title
 //   ask      { runId } or { proposalId }: the report's question box ("Ask about this report", POST /assist/ask page
-//            "report") at the end of the report, as in the Streamlit report; omitted: none
+//            "report") at the end of the report, as in the NiceGUI report; omitted: none
 //   children drawn below the tabs, above the question box
 //
 // Also exported: <ExportMenu base /> (SteerCo Pack, Markdown, CSV of base + "/export/{kind}", base being

@@ -1,6 +1,6 @@
 """Planning sections around plan scenarios: the PMO's scenario workshop (inputs, up to three calculated scenarios side
 by side, save as draft), the saved plan scenarios with the submission to the Portfolio Board, and the reports with the
-board pack. The calculated scenarios are client state (this browser session), as on the Streamlit page; every figure
+board pack. The calculated scenarios are client state (this browser session), as on the React page; every figure
 is calculated by the API."""
 from __future__ import annotations
 

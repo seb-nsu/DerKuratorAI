@@ -1,7 +1,7 @@
-"""Sign-in: user id and password against the user file (same lockouts as the Streamlit sign-in), answer a token.
+"""Sign-in: user id and password against the user file (lockouts per account), answer a token.
 
 A token lasts the session timeout (`auth.session_timeout_minutes`). The front ends renew it while the user works
-(POST /auth/refresh, at most 12 hours after the sign-in), so the timeout acts on inactivity as in Streamlit. Signing
+(POST /auth/refresh, at most 12 hours after the sign-in), so the timeout acts on inactivity. Signing
 out (POST /auth/sign-out) revokes the session on the server, not only in the browser."""
 from __future__ import annotations
 

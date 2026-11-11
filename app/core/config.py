@@ -12,7 +12,7 @@ PROJECT_ROOT = Path(__file__).resolve().parents[2]
 
 ENV_FILE = PROJECT_ROOT / ".env"
 # Settings come from .env; environment variables that are already set take precedence and are not overwritten.
-_REAL_ENV = frozenset(os.environ)  # set before .env was read (shell, container, Streamlit secrets) – never replaced
+_REAL_ENV = frozenset(os.environ)  # set before .env was read (shell, container, host secrets) – never replaced
 load_dotenv(ENV_FILE, override=False)
 _from_env_file: set[str] = {k for k in dotenv_values(ENV_FILE) if k not in _REAL_ENV} if ENV_FILE.exists() else set()
 

@@ -1,20 +1,18 @@
-"""Starts DerKurator AI with the front end chosen by FRONTEND (default streamlit):
+"""Starts DerKurator AI with the front end chosen by FRONTEND (default nicegui):
 
-  streamlit – the Streamlit app (app/main.py); the HTTP API is not started
   nicegui   – NiceGUI pages and the HTTP API in one process (frontends/nicegui)
   react     – the built React front end (frontends/react/dist) and the HTTP API in one process
 
-HOST/PORT set the address (default 127.0.0.1:8080; Streamlit without them keeps .streamlit/config.toml). Only one front end
-serves users at a time; all front ends use the same data, sign-in and rules.
+HOST/PORT set the address (default 127.0.0.1:8080). Only one front end serves users at a time; both use the same
+data, sign-in and rules.
 
 One server process by default. WEB_CONCURRENCY above 1 starts several workers only for FRONTEND=react with
 STATE_STORE=file and an API_TOKEN_SECRET: runs, sign-outs and calculation counters are then shared through files on
-the data volume. NiceGUI and Streamlit hold each user's session in their process and are refused (see docs/API.md,
+the data volume. NiceGUI holds each user's session in its process and is refused (see docs/API.md,
 "Limits")."""
 from __future__ import annotations
 
 import os
-import subprocess
 import sys
 from pathlib import Path
 
@@ -22,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-FRONTENDS = ("streamlit", "nicegui", "react")
+FRONTENDS = ("nicegui", "react")
 
 
 def workers(frontend: str) -> int:
@@ -44,15 +42,10 @@ def workers(frontend: str) -> int:
 
 
 def main() -> None:
-    choice = os.getenv("FRONTEND", "streamlit").strip().lower()
+    choice = os.getenv("FRONTEND", "nicegui").strip().lower()
     if choice not in FRONTENDS:
         sys.exit(f"FRONTEND must be one of {', '.join(FRONTENDS)} (got {choice!r})")
     count = workers(choice)
-    if choice == "streamlit":
-        # HOST/PORT only when set (a container); otherwise .streamlit/config.toml keeps it on localhost
-        flags = [f"--server.{name}={os.environ[env]}" for name, env in (("address", "HOST"), ("port", "PORT"))
-                 if os.getenv(env)]
-        sys.exit(subprocess.call([sys.executable, "-m", "streamlit", "run", str(ROOT / "app" / "main.py"), *flags]))  # noqa: S603
     import uvicorn
 
     host, port = os.getenv("HOST", "127.0.0.1"), int(os.getenv("PORT", "8080"))

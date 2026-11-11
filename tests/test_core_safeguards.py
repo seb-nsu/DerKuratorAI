@@ -79,9 +79,9 @@ class TestEnvFileValidation:
         assert config_issue("DEV") is None and reset_runtime_config().temperature == 0.3
 
 
-class TestWidgetClamp:  # helper (UI behaviour is covered in test_admin_console)
+class TestWidgetClamp:  # the input range rule of the project edit form
     def test_clamp(self):
-        from app.ui.projects_ui import _clamp
+        from app.views.projects import clamp as _clamp
 
         assert _clamp(120.0, 0.0, 100.0) == (100.0, True)
         assert _clamp(-5.0, 0.0, None) == (0.0, True)

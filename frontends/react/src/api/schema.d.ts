@@ -1924,7 +1924,7 @@ export interface paths {
         };
         /**
          * Chat History
-         * @description The caller's analysis history (the same one the Streamlit console restores after a reload), each analysis with
+         * @description The caller's analysis history (the same one every front end restores after a reload), each analysis with
          *     its status, and whether the next request can build on the latest step.
          */
         get: operations["chat_history_api_v1_steering_chat_get"];

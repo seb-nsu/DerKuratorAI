@@ -1,17 +1,8 @@
-"""Display helpers shared by the pages: readable tables, status symbols, decision count, question digest, summary lead."""
-import pandas as pd
-
+"""Display helpers shared by the pages: status symbols, decision count, question digest, summary lead."""
+from app.core.formatting import rule_label, status_text
 from app.crew.ask import digest
 from app.crew.verdict import NO_DECISION, NO_GO, Verdict, lead_summary
-from app.ui.common import decision_count, readable_frame, rule_label, status_text
-
-
-def test_readable_frame_labels_fields_and_cleans_cells():
-    frame = pd.DataFrame({"status_date": ["2026-07-02 00:00:00"], "overall_health": [None], "Note": ["nan"]})
-    out = readable_frame(frame)
-    assert list(out.columns) == ["Status date", "Overall health", "Note"]
-    assert out.iloc[0].tolist() == ["2026-07-02", "–", "–"]
-    assert list(readable_frame(frame, keep={"status_date"}).columns)[0] == "status_date"  # has a column_config
+from app.views.reports import decision_count
 
 
 def test_status_text_pairs_every_status_with_a_shape():
@@ -57,18 +48,3 @@ def test_a_long_reason_is_cut_and_a_paper_without_summary_stays_as_is():
     assert lead_reason(["x" * 300]).endswith("…") and len(lead_reason(["x" * 300])) == 240
     verdict = Verdict(NO_GO, NO_GO, ("Rule.",))
     assert lead_summary("# Paper without sections", verdict) == "# Paper without sections"
-
-
-def test_every_app_page_has_a_sign_in_path():
-    """A reload or a link to any page shows the sign-in (never Streamlit's 'Page not found')."""
-    import re
-    from pathlib import Path
-
-    from app.core.security import ROLE_ADMIN, ROLE_BOARD, ROLE_PM, ROLE_PMO
-    from app.ui.shell import PAGE_PATHS
-    from app.views.navigation import pages_for
-
-    source = (Path(__file__).resolve().parents[1] / "app" / "ui" / "workspace.py").read_text(encoding="utf-8")
-    renderers = set(re.findall(r'^\s+"(\w+)": ', source, flags=re.M))
-    pages = {p["id"] for role in (ROLE_ADMIN, ROLE_PMO, ROLE_PM, ROLE_BOARD) for p in pages_for(role)}
-    assert pages == set(PAGE_PATHS) and pages - {"admin"} <= renderers

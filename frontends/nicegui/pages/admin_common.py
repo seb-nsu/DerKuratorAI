@@ -44,7 +44,7 @@ ICON_LABELS = {"success": "Success", "info": "Note", "warning": "Warning", "erro
 
 def callout(kind: str, text: str) -> None:
     """success | info | warning | error, with icon and text (colour never alone); `code` and **bold** as in the
-    Streamlit texts."""
+    API texts."""
     tone, icon = TONES.get(kind, TONES["info"])
     with ui.element("div").classes(f"dk-callout dk-tone-{tone} w-full") \
             .props(f'role="{"alert" if kind == "error" else "status"}"'):
@@ -68,7 +68,7 @@ def rich(text: str, classes: str = "") -> None:
 
 
 def _inline(text: str) -> str:
-    """`code` and **bold** of the Streamlit captions as HTML (everything else escaped)."""
+    """`code` and **bold** of the API captions as HTML (everything else escaped)."""
     out, code, bold = [], False, False
     parts = escape(text).split("`")
     for i, part in enumerate(parts):

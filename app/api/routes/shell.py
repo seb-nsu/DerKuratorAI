@@ -1,5 +1,5 @@
 """The page frame every front end draws: what the sign-in page may show, and per signed-in user the pages of their
-role, the scope line and the open-inbox count – the same rules as the Streamlit header and navigation."""
+role, the scope line and the open-inbox count – the same rules for every front end."""
 from __future__ import annotations
 
 import logging

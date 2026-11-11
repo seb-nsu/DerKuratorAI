@@ -1,4 +1,4 @@
-"""Plotly figures shared by the Streamlit pages and the HTTP API (the API returns them as figure JSON, so every front
+"""Plotly figures of the HTTP API (the API returns them as figure JSON, so every front
 end draws the same chart): the portfolio risk/value matrix, overloaded teams, the skill heatmap, a report's dependency
 graph and its before/after deltas. Status colours are fixed and always paired with a shape and a word."""
 from __future__ import annotations

@@ -18067,7 +18067,7 @@
     ]
    },
    "get": {
-    "description": "The caller's analysis history (the same one the Streamlit console restores after a reload), each analysis with\nits status, and whether the next request can build on the latest step.",
+    "description": "The caller's analysis history (the same one every front end restores after a reload), each analysis with\nits status, and whether the next request can build on the latest step.",
     "operationId": "chat_history_api_v1_steering_chat_get",
     "responses": {
      "200": {

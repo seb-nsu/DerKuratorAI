@@ -1,4 +1,4 @@
-// A Plotly figure from the API, drawn in the active theme – the same figures the NiceGUI and Streamlit pages show.
+// A Plotly figure from the API, drawn in the active theme – the same figures the NiceGUI pages show.
 // Light mode draws the API's figure as it is (transparent background, theme text colour). Dark mode also swaps the
 // light-page chart colours named in tokens.json "chart_dark" and draws gridlines, axis lines and hover labels in theme
 // colours.

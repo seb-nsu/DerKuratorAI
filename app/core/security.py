@@ -116,7 +116,7 @@ def apply_rls_to_dataset(dataset: "PortfolioDataset", role: str, user_id: str | 
     global _last_rls_scope
     visible = apply_row_level_security(dataset.projects, role, user_id)
     scope = (role, user_id, len(visible), len(dataset.projects))
-    if scope != _last_rls_scope:  # only log scope changes, not every Streamlit rerun
+    if scope != _last_rls_scope:  # only log scope changes, not every request
         log_security_event("RLS applied", role=role, user=user_id, visible=f"{len(visible)}/{len(dataset.projects)}")
         _last_rls_scope = scope
     demands = apply_row_level_security(dataset.demands, role, user_id, column=DEMAND_RLS_COLUMN) \

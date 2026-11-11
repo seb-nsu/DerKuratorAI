@@ -6,7 +6,7 @@ decides. The architecture is organised in four layers with strictly separated re
 
 | Layer | Responsibility | Main modules |
 |---|---|---|
-| **1. Frontend** | Interaction, visualisation, confirmations | `app/main.py`, `app/ui/` |
+| **1. Frontend** | Interaction, visualisation, confirmations | `frontends/nicegui/`, `frontends/react/`, `app/api/`, `app/views/` |
 | **2. Governance Core** | Who may do what, what the verdict is, what was changed and how to undo it | `app/core/`, `app/crew/verdict.py`, `app/data_adapters/base.py` |
 | **3. Agentic Layer** | Understand the request, call the right tools, write the decision paper | `app/crew/` |
 | **4. Data Layer** | System of record and graph analysis | `app/data_adapters/`, `app/graph/`, `data/` |
@@ -17,7 +17,7 @@ write journal, rule-based verdict); an LLM is not involved, planning questions i
 
 ```mermaid
 flowchart TB
-    subgraph FE["1 · Frontend (Streamlit)"]
+    subgraph FE["1 · Frontend (NiceGUI · React, over the HTTP API)"]
         UI["Workspace pages<br/>Overview · Steering Console · Approvals · Planning · Data quality"]
         CP["Project detail page<br/>(master data, costs, deadlines, risks, edit)"]
         AB["A/B Scenario Comparison<br/>+ SteerCo Pack"]
@@ -73,45 +73,53 @@ flowchart TB
 
 ---
 
-## 1. Frontend – Streamlit
+## 1. Frontend – NiceGUI and React over the HTTP API
 
-The front end is a thin presentation layer. It holds no business logic that the backend does not re-check.
+The front ends are a thin presentation layer. They hold no business logic that the backend does not re-check, and
+they never call the core directly: both talk only to the HTTP API.
 
-- **Shell** (`app/ui/shell.py`) – sign-in page (the only page without a session), header with environment badge,
-  signed-in user and sign-out, visible scope and data reload, and the role-based page navigation (`st.navigation`,
-  top position). The System Admin gets the Admin Console only.
-- **Workspace pages** (page list in `app/ui/workspace.py`, one module per page) – *Overview* (`overview.py`: top
-  risks from the graph, KPI ribbon incl. data-quality index, risk/ROI matrix, overloaded teams; *Data quality*: index,
-  quality bars, executive interpretation, filterable findings), *Steering Console* (`console.py`), *Approvals*
-  (`approvals_ui.py`: PMO queue with decision bar; a PM's own proposals), *Projects* (`projects_ui.py`: searchable,
-  filterable table).
-- **Service layer** (`app/services.py`) – the one place the pages call into the crew, the tools and the graph
+- **HTTP API** (`app/api/`, FastAPI under `/api/v1`, `docs/API.md`) – sign-in with a token, then one route group per
+  page; every route checks identity and scope and calls the shared page logic. `scripts/serve.py` serves the API and
+  the front end chosen by `FRONTEND` in one process.
+- **Page logic** (`app/views/`) – what each page shows and does, independent of any front end: navigation per role
+  (`navigation.py`), Overview and Data quality, Projects and the project detail page, Steering Console and report
+  viewer content (`console.py`, `reports.py`), Approvals, What-if comparison (`whatifs.py`), Planning, Insights, the
+  Admin Console (`admin.py`), the SteerCo Pack (`steerco_pack.py`), exports and the Plotly figures (`charts.py`, sent
+  as figure JSON so both front ends draw the same chart).
+- **Service layer** (`app/services.py`) – the one place the API calls into the crew, the tools and the graph
   (pipeline run, graph status and top risks, benefit realisation, risk exposure, PMO figures, model test). Its
-  imports are lazy, so a page loads without the LLM stack.
+  imports are lazy, so a route loads without the LLM stack.
+- **NiceGUI** (`frontends/nicegui/`, Python) – page frame with sign-in guard, header, role navigation and scope line
+  (`shell.py`), one module per page (`pages/`), the report viewer and the page assistant box.
+- **React** (`frontends/react/`, TypeScript, built with Vite) – the same pages and rules; its API types are generated
+  from the committed contract (`frontends/react/openapi.json`), served by `frontends/react_host.py`.
+
+The pages, in both front ends (parity list in `docs/FRONTEND_PARITY.md`):
+
+- **Overview** – top risks from the graph, KPI ribbon incl. data-quality index, risk/ROI matrix, overloaded teams;
+  *Data quality*: index, quality bars, executive interpretation, filterable findings. **Projects** – searchable,
+  filterable table. **Approvals** – PMO queue with decision bar; a PM's own proposals.
 - **Steering Console** – a composer with a guided scenario builder (exact tool parameters, no free-text parsing) or
-  free text, the analysis history on the left and the **report viewer** (`app/ui/report.py`) on the right: header
-  with verdict, status and the one primary action, key figures, tabs Summary (rule-based reasons, thresholds,
-  conditions, flags) · Decision paper (by section) · Changes · Impact · Dependencies · Data quality. In LLM mode the
-  report header appears as soon as the verdict is computed, and the paper is streamed below it line by line (each
-  line PII-masked before it is shown).
-- **Project detail page** (`app/ui/executive.py`) – opens when a project is selected: master data (free vs. governed
-  fields), status history, cost S-curve against budget and EAC, deadlines, dependencies, risks, data-quality findings
-  and an *Edit* tab. The owning Project Manager edits master data there; the save button switches live between
-  *Save Changes* (free fields) and *Submit Proposal* (any governed field).
+  free text, the analysis history and the **report viewer**: header with verdict, status and the one primary action,
+  key figures, tabs Summary (rule-based reasons, thresholds, conditions, flags) · Decision paper (by section) ·
+  Changes · Impact · Dependencies · Data quality.
+- **Project detail page** – opens when a project is selected: master data (free vs. governed fields), status history,
+  cost S-curve against budget and EAC, deadlines, dependencies, risks, data-quality findings and an *Edit* tab. The
+  owning Project Manager edits master data there; free fields are saved directly, any governed field is submitted as
+  a proposal.
 - **A/B Scenario Comparison** – saved scenarios side by side: verdicts, budget-impact waterfalls, change-by-change
   differences.
-- **SteerCo Pack** (`app/ui/steerco_pack.py`) – a one-page, print-ready HTML summary built from the change set and
-  the rule-based verdict, never from LLM text.
-- **Admin Console** (`app/ui/admin_ui.py`) – five areas: *System status* (environment, PII masking, LLM routing,
-  graph, tracing), *Configuration* (model matrix incl. shadow models, business rules, required fields, MCP
-  integrations, environment staging DEV → TEST → PROD), *Operations* (FinOps, notifications, snapshots, graph
-  database), *Logs* (analysis runs, audit, business audit, incidents, shadow, system) and *Quality* (in-app system
-  tests).
+- **SteerCo Pack** – a one-page, print-ready HTML summary built from the change set and the rule-based verdict, never
+  from LLM text.
+- **Admin Console** – *System status* (environment, PII masking, LLM routing, graph, tracing), *Configuration* (model
+  matrix incl. shadow models, business rules, required fields, MCP integrations, environment staging DEV → TEST →
+  PROD), *Operations* (FinOps, notifications, snapshots, graph database), *Logs* (analysis runs, audit, business
+  audit, incidents, shadow, system) and *Quality* (in-app system tests).
 
 UX safeguards: irreversible actions (Approve & Apply, clear history, delete scenario) require an explicit confirmation
 in a dialog;
-every section runs inside an **error boundary**, so end users see an incident ID instead of a traceback, and a failing
-chart never takes the rest of the page down.
+every page section loads from its own API call and shows an error box with an incident ID instead of a traceback, so
+a failing chart never takes the rest of the page down.
 
 ## 2. Governance Core
 
@@ -127,7 +135,7 @@ unchanged behind an API.
   events.
 - Demo accounts (`data/demo_users.json`, public demo password) work in DEV and TEST only; PROD refuses them and
   needs its own user file. SSO via OIDC (Microsoft Entra ID) replaces the local accounts on the roadmap.
-- Environments: DEV runs locally, TEST is the hosted demo (Streamlit Community Cloud, offline mode), PROD is not
+- Environments: DEV runs locally, TEST is the hosted demo (Render or Docker, offline mode), PROD is not
   deployed yet.
 
 **RBAC & row-level security** (`app/core/security.py`)
@@ -209,7 +217,7 @@ Archiving starts the new file with a record that points at the archive's last ha
 existed are counted and reported, not rejected. A SIEM export is the next step.
 
 **Reloading `.env`.** Admin Console → *Reload from .env and environment file* re-reads `.env` without a restart (new
-keys, another environment); values set outside `.env` (shell, container, Streamlit secrets) still win, and a variable
+keys, another environment); values set outside `.env` (shell, container, host secrets) still win, and a variable
 removed from `.env` is removed again.
 
 ## 3. Agentic Layer – own agent loop on the provider SDKs
@@ -279,8 +287,8 @@ outside the recommendation line against the rule-based verdict; findings become 
 (`ANTHROPIC_BASE_URL`, `OPENAI_BASE_URL`) as missing, so every LLM path (crew, shadow, data quality, assistant) falls
 back to offline for it; the endpoint is passed to the SDK client.
 
-**Page assistant** (`app/crew/ask.py`, `app/ui/ask_box.py`, facts in `app/ui/assist_facts.py`) – a single LLM call
-per question, outside the crew: the code writes the facts of the page from the reader's scope-filtered dataset (the
+**Page assistant** (`app/crew/ask.py`, facts in `app/views/assist_facts.py`, the box in `frontends/nicegui/ask_box.py`
+and `frontends/react/src/components/AskBox.tsx`) – a single LLM call per question, outside the crew: the code writes the facts of the page from the reader's scope-filtered dataset (the
 same frames the page renders), the Advisory model answers from them under fixed rules (only these facts, no own
 verdict, change requests go to the Steering Console, the facts are data, not instructions). Facts and question are
 name-masked before the call and the answer after it; answers are cached per model, question and facts; without a key
@@ -383,8 +391,8 @@ scenarios, chat sessions (hashed file names, 24 h retention), snapshots and per-
 
 ## Quality assurance
 
-- **Test suite** (`tests/`, 1,428 tests including 40 browser tests) – unit tests for the governance core, the tools and the verdict engine, and
-  UI tests with Streamlit's `AppTest`; no network, no API keys, all logs and data in temporary directories.
+- **Test suite** (`tests/`, 1,336 tests including 40 browser tests) – unit tests for the governance core, the tools and the verdict engine, API
+  tests for every route and Playwright browser tests against both front ends; no network, no API keys, all logs and data in temporary directories.
 - **Golden verdict cases** (`tests/test_verdict_golden.py`, `tests/golden/`) – 36 fixed scenarios on a synthetic
   portfolio with a fixed reference date, through the real pipeline without parser or LLM. They hit every verdict
   rule and every guided scenario type and cover every branch of `compute_verdict`; coverage tests fail when a new
@@ -415,13 +423,13 @@ scenarios, chat sessions (hashed file names, 24 h retention), snapshots and per-
 ## Target architecture
 
 The production path keeps layers 2–4 and replaces the edges: the governance core and agentic layer move behind a
-**headless FastAPI** service, the Streamlit front end is replaced by a **React** application, identities come from
+**headless FastAPI** service (done: NiceGUI and React already run on it only), identities come from
 **Microsoft Entra ID (OIDC)** group claims, and the file-based system of record is replaced by live ServiceNow / Jira
 access through the existing **MCP connector**.
 
 ## Module boundaries
 
-The layers import downwards: `app/ui` → `app/services.py` → `app/crew` / `app/planning` / `app/graph` →
+The layers import downwards: `frontends/` → `app/api` → `app/views` / `app/services.py` → `app/crew` / `app/planning` / `app/graph` →
 `app/core` / `app/data_adapters`. A few imports point the other way and are deliberately lazy (inside the function),
 so no module needs another at load time:
 
@@ -429,4 +437,3 @@ so no module needs another at load time:
   the core's four-eyes, masking, snapshot and log functions, which in turn know the dataset tables.
 - `app/crew/tools/simulator_tools.py` → `app/crew/agents.py` – only the qualitative estimate needs a model.
 - `app/crew/shadow.py` → `app/crew/pipeline.py` – the shadow run reuses the crew path.
-- `app/ui/common.py` ↔ `app/ui/steerco_pack.py` – the pack is built on demand from the report.

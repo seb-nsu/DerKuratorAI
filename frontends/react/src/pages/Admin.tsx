@@ -1,6 +1,6 @@
 // System Admin Console: system status, operations (snapshots, database, notifications, environment staging), logs and
 // the developer tools (models and shadowing, MCP, FinOps, shadow logs, in-app system tests). Same
-// areas, texts and confirmations as the Streamlit console and the NiceGUI page; every value and action comes from the
+// areas, texts and confirmations as the NiceGUI page; every value and action comes from the
 // /admin API.
 // Deep link: /admin?tab=<area> or ?tab=<area>.<section>, e.g. ?tab=developer.models.
 import { useEffect, useRef, useState, type ComponentType, type KeyboardEvent } from "react";

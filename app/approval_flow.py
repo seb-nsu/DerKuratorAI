@@ -1,4 +1,4 @@
-"""The PMO decision on a change proposal, shared by every front end (Streamlit pages and the HTTP API).
+"""The PMO decision on a change proposal, shared by every front end through the HTTP API.
 
 Approve = validate the decision, reserve the proposal (no second approver), compare-and-write the change set with a
 snapshot, record the decision, audit it. Reject = record the decision with its reason, audit it. Each step keeps the

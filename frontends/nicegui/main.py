@@ -5,17 +5,19 @@ from __future__ import annotations
 import importlib
 import os
 import secrets
+from pathlib import Path
 
 from fastapi import FastAPI, Request
 from nicegui import app, ui
 from nicegui.storage import Storage
 
-from app.core.config import PROJECT_ROOT
 from frontends.nicegui import api, shell
 from frontends.nicegui.components import empty, page_header
 from frontends.nicegui.pages import sign_in
 
-# page id -> module under frontends.nicegui.pages (same ids as the Streamlit pages and the React routes)
+ASSETS = Path(__file__).resolve().parent / "assets"  # the logo (favicon)
+
+# page id -> module under frontends.nicegui.pages (same ids as the React routes)
 PAGES = ("overview", "console", "approvals", "projects", "scenarios", "planning", "data_quality", "rules", "admin",
          "insights")
 
@@ -31,7 +33,7 @@ def _page_renderer(page_id: str):
 
 
 def register_pages() -> None:
-    app.add_static_files("/assets", str(PROJECT_ROOT / "app" / "ui" / "assets"))
+    app.add_static_files("/assets", str(ASSETS))
 
     @ui.page("/sign-in", title="Sign in · DerKurator AI")
     async def sign_in_page(next: str | None = None) -> None:
@@ -74,7 +76,6 @@ def session_cookie() -> dict:
 def storage_path():
     """Where NiceGUI keeps the per-browser session (it holds the API token): NICEGUI_STORAGE_PATH, else a folder in
     the app's write directory – never the working directory, which is the repository or a read-only image."""
-    from pathlib import Path
 
     from app.core.logs import WRITE_DIR
 
@@ -91,7 +92,7 @@ def build(api_app: FastAPI | None = None) -> FastAPI:
     if not os.getenv("API_BASE_URL"):
         api.use_asgi(api_app)
     register_pages()
-    ui.run_with(api_app, title="DerKurator AI", favicon=str(PROJECT_ROOT / "app" / "ui" / "assets" / "logo.svg"),
+    ui.run_with(api_app, title="DerKurator AI", favicon=str(ASSETS / "logo.svg"),
                 storage_secret=storage_secret(), dark=None, session_middleware_kwargs=session_cookie())
     return api_app
 

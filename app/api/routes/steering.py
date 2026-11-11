@@ -1,9 +1,9 @@
 """Steering Console: one what-if through data quality, simulation, dependency check, rule-based verdict and decision
-paper – the same pipeline the Streamlit console runs, from free text or from a guided scenario. The result stays on
+paper – from free text or from a guided scenario. The result stays on
 the server under its run id; a proposal, a direct apply or a saved what-if names that id, never a change set.
 
-The chat history is the Streamlit console's (one per user and role): every run is added to it, so a reload of either
-front end shows the same analyses."""
+The chat history is kept per user and role: every run is added to it, so a reload of either front end shows the
+same analyses."""
 from __future__ import annotations
 
 import logging
@@ -467,7 +467,7 @@ def _public(message: dict, state: dict | None) -> dict:
 
 @router.get("/steering/chat")
 def chat_history(user: User = Depends(requester)) -> ChatHistory:
-    """The caller's analysis history (the same one the Streamlit console restores after a reload), each analysis with
+    """The caller's analysis history (the same one every front end restores after a reload), each analysis with
     its status, and whether the next request can build on the latest step."""
     messages = load_chat(user.role, user.user_id)
     last = max((i for i, m in enumerate(messages) if m.get("role") == "assistant"), default=-1)

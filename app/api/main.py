@@ -28,7 +28,7 @@ PREFIX = "/api/v1"
 def _workers_allowed() -> None:
     """`uvicorn ... --workers` / WEB_CONCURRENCY > 1 starts several workers. They share runs, sign-outs and the
     calculation counters only through the file store (STATE_STORE=file) and accept each other's tokens only with one
-    API_TOKEN_SECRET; NiceGUI and Streamlit stay in one process. Refuse to start instead of losing runs silently."""
+    API_TOKEN_SECRET; NiceGUI stays in one process. Refuse to start instead of losing runs silently."""
     try:
         workers = state_store.worker_count()
     except ValueError:

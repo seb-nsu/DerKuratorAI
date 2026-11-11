@@ -292,7 +292,7 @@ function TestResults({ counts, cases, header }: { counts: Record<string, number>
   );
 }
 
-let lastRun: TestRun | null = null; // the run of this page visit, as in the Streamlit session
+let lastRun: TestRun | null = null; // the run of this page visit
 
 export function TestsSection() {
   const state = useLoad(async () => ({ view: await api.get<Tests>("/admin/system-tests"), files: await loadFiles() }));

@@ -1,5 +1,5 @@
-"""The pages of each role and their order in the top navigation – one list for all three front ends (Streamlit,
-NiceGUI, React). A page with a parent is a sub-page: it keeps its own URL (deep links), is opened from its parent page
+"""The pages of each role and their order in the top navigation – one list for both front ends (NiceGUI,
+React). A page with a parent is a sub-page: it keeps its own URL (deep links), is opened from its parent page
 and is not listed in the navigation, where its parent stays highlighted."""
 from __future__ import annotations
 
