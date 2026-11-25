@@ -27,8 +27,8 @@ Rule order (first match decides the verdict; all CONDITIONAL reasons are collect
      benefit realisation below benefit_realization_min_pct, a due benefit tranche without any actual,
      project merge (re-baseline of the target; second business unit or sponsor),
      red trigger: a measure turns another project calculated red, leaves a cost gap above
-     recovery_min_gap_eur, takes from a donor carrying a highly weighted strategic goal, moves more than the
-     board threshold to the red project as a package, or stays just below the board threshold,
+     recovery_min_gap_eur, takes from a donor carrying a highly weighted strategic goal, or has a single step
+     just below the board threshold,
      other tool warnings)                                      -> CONDITIONAL GO
   5. simulation results without findings                       -> GO
   6. analysis only (no simulation)                             -> NO DECISION REQUIRED (analysis)
@@ -413,11 +413,6 @@ def _recovery_conditions(facts: list[dict[str, Any]], rules: BusinessRules, reas
                            f"(weight {f.get('weight')}).")
             conditions.add(f"Confirm with the portfolio board that {f['successor']} may give up resources despite its "
                            "strategic goal.", SPONSOR)
-        elif kind == "package_board" and rules.board_approval_threshold_eur \
-                and (f.get("total") or 0) > rules.board_approval_threshold_eur:
-            reasons.append(f"{f['project']}: the measures of the package move {_eur(f['total'])} to the project in "
-                           f"total – above the board approval threshold of {_eur(rules.board_approval_threshold_eur)}.")
-            conditions.add(f"Obtain board approval for the package of {f['project']} as a whole.", SPONSOR)
         elif kind == "threshold_near":
             reasons.append(f"{f['project']}: a single step of {_eur(f['amount'])} stays just below the board approval "
                            f"threshold of {_eur(f['threshold'])} – named on purpose, so it is not overlooked.")

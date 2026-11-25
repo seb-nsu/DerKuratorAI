@@ -9,7 +9,7 @@ set and facts come from there. On top, this module measures per candidate:
 - the portfolio probability before and after (Monte Carlo with the same seed).
 
 and adds the facts of the red trigger to the verdict (rule stage 4, CONDITIONAL GO, never silently):
-`collateral_red`, `gap_not_closed`, `donor_strategic`, and for packages `package_board` and `threshold_near`."""
+`collateral_red`, `gap_not_closed`, `donor_strategic`, and for packages `threshold_near`."""
 from __future__ import annotations
 
 import contextvars

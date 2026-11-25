@@ -12,8 +12,9 @@ closure per collateral point) is used and the option says so.
 
 Every package runs at the end once more through the pipeline as one multi-step scenario (base_state chain): the
 package verdict is the real verdict of the combination, never a sum of single verdicts. The board approval threshold
-applies to the sum the package moves to the red project (decision of 24.11.2026); a single step just below the
-threshold is flagged (recovery_threshold_avoidance_flag)."""
+applies to the sum the package moves to the red project (decision of 24.11.2026) – the verdict engine accumulates the
+budget changes of a project across the steps; a single step just below the threshold is flagged
+(recovery_threshold_avoidance_flag)."""
 from __future__ import annotations
 
 import logging
@@ -45,6 +46,7 @@ OPTION_LABELS = {LEAST: "Least intervention", FASTEST: "Fastest effect", REBUILD
                  REFERENCE: "Do nothing (reference)", END_SHIFT: "Move the end date openly"}
 MAX_OPTIONS = 4
 MIX_LEVERS = (TRANSFER, DONOR_STOP, SCOPE_CUT)
+MEASURE_PENALTY = 0.01
 
 
 def money_value(c: dict[str, Any]) -> float:
@@ -59,16 +61,17 @@ def money_value(c: dict[str, Any]) -> float:
 def choose_mix(items: list[dict[str, Any]], gap: float, reserve_free: float, max_donors: int,
                solver: bool = True) -> tuple[list[dict[str, Any]], float, bool]:
     """Chosen candidates, reserve amount and whether the 0-1 programme solved it (False = greedy). Minimises
-    100 × collateral + 10 per measure touching another project + 1 per measure + reserve share of the gap, so that
-    the chosen measures plus the reserve close the gap."""
+    100 × collateral + a small penalty per measure (twice for a measure touching another project) + the share of the
+    gap paid from the reserve, so that the chosen measures plus the reserve close the gap. The reserve is the scarce
+    portfolio buffer: unused budget of donors goes first when it closes at least 2 % of the gap."""
     values = [money_value(c) for c in items]
     if solver and items:
         try:
             from scipy.optimize import Bounds, LinearConstraint, milp
 
             n = len(items)
-            cost = np.array([100.0 * (c["result"].get("collateral_points") or 0) + (10.0 if c.get("touches_others")
-                                                                                       else 0.0) + 1.0
+            cost = np.array([100.0 * (c["result"].get("collateral_points") or 0) + MEASURE_PENALTY
+                             + (MEASURE_PENALTY if c.get("touches_others") else 0.0)
                              for c in items] + [1.0 / max(gap, 1.0)])
             a = np.zeros((2, n + 1))
             a[0, :n], a[0, n] = values, 1.0  # closure >= gap
@@ -85,12 +88,11 @@ def choose_mix(items: list[dict[str, Any]], gap: float, reserve_free: float, max
         except Exception:  # noqa: BLE001 - greedy fallback below
             logger.exception("Recovery package optimiser failed – greedy fallback")
     order = sorted(range(len(items)), key=lambda i: (items[i]["result"].get("collateral_points") or 0,
-                                                     bool(items[i].get("touches_others")) and values[i] < gap,
                                                      -values[i]))
     chosen, covered, donors = [], 0.0, 0
     for i in order:
-        if covered + reserve_free >= gap and chosen:
-            break
+        if values[i] < MEASURE_PENALTY * 2 * gap and covered + reserve_free >= gap:
+            continue
         d = len(items[i].get("donors") or [])
         if donors + d > max_donors or values[i] <= 0:
             continue
@@ -116,14 +118,14 @@ def _steps_of(chosen: list[dict[str, Any]], reserve: float, red_pid: str) -> lis
 
 
 def package_facts(steps: list[dict[str, Any]], red_pid: str, rules: BusinessRules) -> list[dict[str, Any]]:
-    """`package_board`: the board threshold on the package sum; `threshold_near`: a single money step just below it."""
+    """`threshold_near`: a single money step just below the board threshold. The board threshold on the package sum
+    needs no fact of its own: the verdict engine accumulates every budget change of a project across the steps of a
+    scenario, so a package whose steps together exceed the threshold is a board decision already."""
     threshold = rules.board_approval_threshold_eur
     amounts = [float((s.get("params") or {}).get("amount") or 0) for s in steps
                if s["action"] in ("reserve_draw", "budget_transfer") and (s["action"] == "reserve_draw"
                                                                          or s.get("target") == red_pid)]
     facts: list[dict[str, Any]] = []
-    if len(amounts) > 1 and threshold:
-        facts.append({"type": "package_board", "project": red_pid, "total": round(sum(amounts), 0)})
     if rules.recovery_threshold_avoidance_flag and threshold:
         low = threshold * (1 - rules.recovery_threshold_margin_pct / 100)
         for amount in amounts:

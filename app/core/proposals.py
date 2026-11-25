@@ -163,13 +163,16 @@ def _notify(event: str, proposal_id: str, level: int | None = None, status: str 
 def submit_proposal(requester: str, requester_role: str, request: str, paper: str, verdict: str | None,
                     changes: list[dict[str, Any]], forced: bool = False,
                     verdict_record: dict[str, Any] | None = None, reverts: str | None = None,
-                    kind: str | None = None, justification: str = "") -> dict[str, Any]:
+                    kind: str | None = None, justification: str = "",
+                    recommendation_id: str | None = None) -> dict[str, Any]:
     """Stores a change set for PMO approval. `verdict` is the label (display, filters, override rule);
     `verdict_record` the full rule-based verdict (reasons, conditions, the thresholds in force, as_of), so the decision
     stays reproducible after the business rules change. The change set is stored as its net change per field
     (a multi-step scenario that cuts, raises and cuts again proposes one change). `reverts`: the approved proposal
     this one takes back. `kind` PLAN: the annual plan, decided by the Portfolio Board. `justification`: why the
-    requester submits a NO-GO / incomplete result anyway (the console asks for it). Raises ProposalError."""
+    requester submits a NO-GO / incomplete result anyway (the console asks for it). `recommendation_id`: the red-trigger
+    recommendation whose option the requester adopted (app/recovery) – the requester stays a person. Raises
+    ProposalError."""
     from app.data_adapters.base import net_changes
 
     changes = net_changes(changes)
@@ -182,6 +185,7 @@ def submit_proposal(requester: str, requester_role: str, request: str, paper: st
         "projects": sorted({str(c.get("project_id")) for c in changes}),
         **({"reverts": reverts} if reverts else {}), **({"kind": kind} if kind else {}),
         **({"justification": justification.strip()} if justification.strip() else {}),
+        **({"recommendation_id": recommendation_id} if recommendation_id else {}),
     }
     with _locked() as path:
         logs_entry = {"timestamp": clock.stamp(), "environment": logs.current_environment(),

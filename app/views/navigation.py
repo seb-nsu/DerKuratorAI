@@ -16,6 +16,7 @@ _PMO = (
     ("data_quality", "Data quality", "fact_check", "projects"),
     ("scenarios", "What-if comparison", "compare_arrows", "console"),
     ("insights", "Decision insights", "insights", "overview"),  # status check, probabilities, decision review
+    ("recovery", "Recovery", "healing", "overview"),  # red trigger: recommendations with calculated options
 )
 # a Project Manager works on their own projects, proposals and demands: the titles say so
 _PM = (

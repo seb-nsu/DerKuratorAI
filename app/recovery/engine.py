@@ -16,7 +16,7 @@ from app.core import clock
 from app.core.business_rules import BusinessRules, current_rules
 from app.crew.tools.status_check import check_dataset
 from app.recovery import evaluate, levers, package, store, watch
-from app.recovery.diagnosis import REPORTING, UNMEASURED, diagnose
+from app.recovery.diagnosis import COST, REPORTING, UNMEASURED, Cause, diagnose
 from app.recovery.impact import build_impact, red_projects
 
 logger = logging.getLogger("derkurator.recovery")
@@ -102,9 +102,10 @@ def analyse(project_id: str, dataset: Any, today: date | None = None, rules: Bus
     evaluated: list[dict[str, Any]] = []
     for cand in candidates:
         target = cand.project
-        target_causes = causes if target == pid else []
+        target_causes = causes if target == pid else [
+            Cause(COST, "Cost gap of the red predecessor.", gap_eur=watch.cost_gap(rows.get(target, {})))]
         outcome = evaluate.run_chain(cand.steps, dataset, names, force, today, rules)
-        result = evaluate.measure(outcome, target, target_causes or causes, by_id, rows.get(target, rows[pid]),
+        result = evaluate.measure(outcome, target, target_causes, by_id, rows.get(target, rows[pid]),
                                   dataset, cand.donors, today, rules, base_probability, monte_carlo=False)
         item = {**cand.to_dict(), "result": result}
         item["usable"] = evaluate.usable(result, cand.partial, target)

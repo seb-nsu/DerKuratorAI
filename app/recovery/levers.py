@@ -282,5 +282,6 @@ def generate(project_id: str, causes: list[Cause], impact: dict[str, Any], datas
                 add(RESERVE, COST, [_step("reserve_draw", pred, amount=amount,
                                           reason=f"Red predecessor of {project_id} (red trigger)")],
                     f"The red predecessor {pred} holds {project_id} back; close its cost gap of €{gap:,.0f} first.",
-                    touches_others=True, money_to_project=0.0)
+                    touches_others=True, money_to_project=amount)
+                out[-1].project = pred
     return out[:rules.recovery_max_candidates], not_possible
