@@ -91,8 +91,9 @@ def choose_mix(items: list[dict[str, Any]], gap: float, reserve_free: float, max
                                                      -values[i]))
     chosen, covered, donors = [], 0.0, 0
     for i in order:
-        if values[i] < MEASURE_PENALTY * 2 * gap and covered + reserve_free >= gap:
-            continue
+        collateral = items[i]["result"].get("collateral_points") or 0
+        if (values[i] < MEASURE_PENALTY * 2 * gap or collateral) and covered + reserve_free >= gap:
+            continue  # the reserve closes the rest: no tiny measure, no measure with collateral damage
         d = len(items[i].get("donors") or [])
         if donors + d > max_donors or values[i] <= 0:
             continue

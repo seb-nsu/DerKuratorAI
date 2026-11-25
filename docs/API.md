@@ -55,6 +55,12 @@ request, so a removed or changed account takes effect at once. A token from one 
 | `GET /proposals`, `GET /proposals/{id}` | PMO: all, others: their own | Proposals with deadline state; `?status=submitted` is the PMO inbox (escalated first) |
 | `POST /proposals` | PMO, PM | Submits a run by its `run_id` (never a change set from the client). A NO-GO needs a `justification` |
 | `POST /proposals/{id}/approve`, `/reject` | PMO (not the requester) | Four-eyes decision: compare-and-write with a snapshot, audit. A NO-GO needs `override` plus a comment; a rejection needs a comment |
+| `GET /recovery/recommendations?status=`, `GET /recovery/recommendations/{id}` | PMO, PM | Red trigger recommendations: trigger, causes, impact, options (each calculated as one package through the verdict engine), rejected measures. A PM sees only own projects; every other project is replaced by "another project in the portfolio" |
+| `GET /recovery/alerts`, `GET /recovery/projects/{id}` | PMO, PM | Open recommendations for the overview's alert band (starts the idempotent scan in the background); the recommendations of one project |
+| `POST /recovery/analyse` | PMO | 'Analyse now' / 'Recalculate' for a project that is red already, also with the trigger off; audited |
+| `POST /recovery/recommendations/{id}/adopt` | PMO, PM of the red project | Runs the option as a what-if in the caller's name (Steering Console, ready to submit); a PM only for an option that changes their own project alone. The proposal carries `recommendation_id`; a second PMO approves |
+| `POST /recovery/recommendations/{id}/dismiss` | PMO | Dismiss with a mandatory reason (learning loop); audited |
+| `POST /recovery/scan`, `GET /recovery/scans` | PMO; System Admin | Run the watch now (nothing while `recovery_enabled` is 0); the last scans and the hash chain of the recommendation store |
 | `GET /planning` | PMO, PM, Portfolio Board | Planning horizon, reference date, demands in scope and the page sections of the caller's role |
 | `GET /planning/demands` | PMO, PM, Portfolio Board | Demands in the caller's scope with money per planning year and data-quality findings; filters `business_unit`, `status`, `year`. A PM sees only own demands and no rank |
 | `GET /planning/demands/{id}`, `/demands/{id}/slip?quarters=` | PMO, PM, Portfolio Board | Demand detail (master data, annual figures, capacity, assessment, dependency chain; PMO and Board also the plan position) and what a delay of 1–4 quarters pushes along; outside the scope 404 |

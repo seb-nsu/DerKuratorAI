@@ -3090,6 +3090,12 @@
       },
       "title": "Hit Rate",
       "type": "array"
+     },
+     "recommendations": {
+      "additionalProperties": true,
+      "description": "Red trigger learning loop: adopted recommendations 6/12 months on, dismissal reasons per measure",
+      "title": "Recommendations",
+      "type": "object"
      }
     },
     "required": [

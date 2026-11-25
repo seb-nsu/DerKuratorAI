@@ -29,7 +29,11 @@ type Decision = {
   held: boolean | null; outcomes: { text?: string }[];
 };
 type HitRate = { verdict: string; decisions: number; held: number; hit_rate_pct: number | null };
-type Review = { due_for_review: number; conditions_overdue: number; decisions: Decision[]; hit_rate: HitRate[] };
+type Loop = {
+  adopted?: unknown[]; recovered?: number; judged?: number; recovery_rate_pct?: number | null;
+  dismissed_by_measure?: { measure: string; dismissed: number; reasons: string[] }[];
+};
+type Review = { due_for_review: number; conditions_overdue: number; decisions: Decision[]; hit_rate: HitRate[]; recommendations?: Loop };
 
 const dash = (value: unknown) => (value === null || value === undefined || value === "" ? "–" : String(value));
 const num = (value: number | null | undefined) => (value == null ? "–" : value.toLocaleString("en-US", { maximumFractionDigits: 1 }));
@@ -99,6 +103,22 @@ function ReferenceView({ projects }: { projects: string[] }) {
   );
 }
 
+// red trigger learning loop: adopted recommendations 6/12 months on, dismissal reasons per measure
+function LoopView({ loop }: { loop: Loop }) {
+  const dismissed = loop.dismissed_by_measure ?? [];
+  if (!loop.adopted?.length && !dismissed.length) return null;
+  const rate = loop.recovery_rate_pct;
+  return (
+    <>
+      <Caption text={`Red trigger: ${loop.adopted?.length ?? 0} recommendation(s) adopted · ${loop.recovered ?? 0} of ${loop.judged ?? 0} reviewed back out of red${rate == null ? "" : ` (${num(rate)} %)`}`} />
+      {dismissed.length > 0 && (
+        <Table label="Dismissed recommendations per measure" head={["Measure", "Dismissed", "Reasons"]}
+          rows={dismissed.map((m) => [m.measure, m.dismissed, m.reasons.join("; ")])} />
+      )}
+    </>
+  );
+}
+
 function ReviewView({ review }: { review: Review }) {
   const [chosen, setChosen] = useState(review.decisions[0]?.proposal_id ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -109,6 +129,7 @@ function ReviewView({ review }: { review: Review }) {
         <Table label="Hit rate per verdict" head={["Verdict", "Decisions", "Held", "Hit rate %"]}
           rows={review.hit_rate.map((h) => [h.verdict, h.decisions, h.held, num(h.hit_rate_pct)])} />
       )}
+      <LoopView loop={review.recommendations ?? {}} />
       {!review.decisions.length ? (
         <Info text="No approved decision yet." />
       ) : (

@@ -3407,6 +3407,13 @@ export interface components {
             hit_rate: {
                 [key: string]: unknown;
             }[];
+            /**
+             * Recommendations
+             * @description Red trigger learning loop: adopted recommendations 6/12 months on, dismissal reasons per measure
+             */
+            recommendations?: {
+                [key: string]: unknown;
+            };
         };
         /** Delegation */
         Delegation: {

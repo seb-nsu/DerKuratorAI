@@ -9,6 +9,7 @@ import hashlib
 import json
 import logging
 import time
+import uuid
 from datetime import date
 from typing import Any
 
@@ -195,7 +196,7 @@ def needs_options(recommendation: dict[str, Any]) -> bool:
 # =========================================================================== orchestration
 def store_analysis(recommendation: dict[str, Any], key: str | None = None) -> dict[str, Any] | None:
     key = key or recommendation.get("trigger_key") or (
-        f"{recommendation['project_id']}|{watch.MANUAL}|{recommendation['data_state']}|{clock.stamp()}")
+        f"{recommendation['project_id']}|{watch.MANUAL}|{recommendation['data_state']}|{uuid.uuid4().hex}")
     stored = store.create(recommendation, key)
     if stored is not None:
         gap = max((c.get("gap_eur") or 0 for c in recommendation.get("causes") or [] if c["kind"] == "cost"), default=0)
