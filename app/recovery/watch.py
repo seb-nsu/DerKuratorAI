@@ -21,6 +21,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 from dataclasses import asdict, dataclass, field
 from datetime import date
 from typing import Any
@@ -77,7 +78,7 @@ def _num(value: Any) -> float | None:
         number = float(value)
     except (TypeError, ValueError):
         return None
-    return None if number != number else number
+    return None if math.isnan(number) else number
 
 
 def cost_gap(row: dict[str, Any]) -> float:

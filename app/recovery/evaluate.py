@@ -20,7 +20,7 @@ from typing import Any
 import pandas as pd
 
 from app.core.business_rules import BusinessRules, candidate_rules
-from app.crew.tools.status_check import CLOSED_STATES, StatusCheck, check_project
+from app.crew.tools.status_check import CLOSED_STATES, StatusCheck
 from app.crew.verdict import CONDITIONAL_GO, GO, INCOMPLETE, NO_GO, compute_verdict
 from app.recovery.watch import SYSTEM_IDENTITY, cost_gap
 
@@ -186,7 +186,7 @@ def measure(outcome: dict[str, Any], red_pid: str, causes: list[Any], base_check
     if monte_carlo:
         try:
             probability_after = simulate_portfolio(after_ds, today, rules)["summary"].get("probability_within_budget_pct")
-        except Exception:  # noqa: BLE001 - context only
+        except Exception:
             logger.exception("Monte Carlo after a recovery candidate failed")
     return {
         "blocked": False, "requests": outcome["requests"], "verdict": verdict.to_dict(), "decision": verdict.decision,

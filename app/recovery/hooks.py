@@ -35,7 +35,7 @@ def scan_now(source: str) -> dict:
 def _quiet(source: str) -> None:
     try:
         scan_now(source)
-    except Exception:  # noqa: BLE001 - retried by the next hook or the scheduler
+    except Exception:
         logger.exception("Recovery scan (%s) failed", source)
 
 
@@ -46,6 +46,6 @@ def scan_in_background(source: str) -> bool:
     try:
         threading.Thread(target=_quiet, args=(source,), name=f"recovery-scan-{source}", daemon=True).start()
         return True
-    except Exception:  # noqa: BLE001
+    except Exception:
         logger.exception("Recovery scan could not be started")
         return False

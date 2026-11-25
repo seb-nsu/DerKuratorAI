@@ -85,7 +85,7 @@ def choose_mix(items: list[dict[str, Any]], gap: float, reserve_free: float, max
                 chosen = [c for i, c in enumerate(items) if result.x[i] > 0.5]
                 reserve = max(gap - sum(values[i] for i, c in enumerate(items) if result.x[i] > 0.5), 0.0)
                 return chosen, round(min(reserve, reserve_free), 0), True
-        except Exception:  # noqa: BLE001 - greedy fallback below
+        except Exception:
             logger.exception("Recovery package optimiser failed – greedy fallback")
     order = sorted(range(len(items)), key=lambda i: (items[i]["result"].get("collateral_points") or 0,
                                                      -values[i]))

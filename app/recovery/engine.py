@@ -38,7 +38,7 @@ def _blocked(dataset: Any, today: date) -> dict[str, str]:
 
     try:
         return dict(DataStewardAgent().run(dataset, today).blocked_reasons)
-    except Exception:  # noqa: BLE001 - without the steward every project counts as blocked for donors
+    except Exception:
         logger.exception("Data Steward failed during the recovery analysis")
         return {str(p): "Data Steward unavailable" for p in dataset.projects["project_number"]}
 
@@ -223,7 +223,7 @@ def run_scan(dataset: Any | None = None, today: date | None = None, source: str 
             item = store_analysis(rec, trig.key)
             if item is not None:
                 stored.append(item["id"])
-        except Exception:  # noqa: BLE001 - one failed analysis never stops the scan
+        except Exception:
             logger.exception("Recovery analysis of %s failed", trig.project_id)
     return {"enabled": True, **result.to_dict(), "stored": stored}
 
