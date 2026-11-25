@@ -68,6 +68,10 @@ RULE_GROUPS: dict[str, tuple[str, ...]] = {
                                     "status_burn_gap_red_pct", "status_slip_yellow_days", "status_slip_red_days",
                                     "status_report_max_age_days"),
     "Forecast ranges": ("simulation_runs", "confidence_level_pct", "reference_class_min_projects"),
+    "Red trigger (recovery)": ("recovery_enabled", "recovery_trigger_calculated", "recovery_min_gap_eur",
+                               "recovery_regap_pct", "recovery_max_candidates", "recovery_max_donors",
+                               "recovery_max_scope_cut_pct", "recovery_ttl_days",
+                               "recovery_threshold_avoidance_flag", "recovery_threshold_margin_pct"),
 }
 INT_RULES = {name for name, f in BusinessRules.model_fields.items() if f.annotation is int}
 

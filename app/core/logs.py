@@ -48,6 +48,7 @@ STATE_DIR = WRITE_DIR / "state"  # state shared by all worker processes (app.cor
 PROPOSALS_LOG = WRITE_DIR / "pending_changes.jsonl"
 SCENARIOS_LOG = WRITE_DIR / "saved_scenarios.jsonl"
 NOTIFY_OUTBOX = WRITE_DIR / "notifications.jsonl"  # mail / Teams outbox (app.core.notifications)
+RECOVERY_LOG = WRITE_DIR / "recovery.jsonl"  # recommendations of the red trigger (app.recovery.store), hash-chained
 
 LOG_FORMAT = "%(asctime)s | %(levelname)-7s | %(env)-4s | %(name)s | %(message)s"
 _HANDLER_NAME = "derkurator-app-log"
@@ -169,7 +170,8 @@ def _last_hash(path: Path) -> str:
 
 
 def _chained(path: Path) -> bool:
-    return Path(path).resolve() == Path(AUDIT_LOG).resolve()
+    """The decision log and the recommendation store of the red trigger are hash-chained."""
+    return Path(path).resolve() in (Path(AUDIT_LOG).resolve(), Path(RECOVERY_LOG).resolve())
 
 
 def append_jsonl(path: Path, entry: dict[str, Any]) -> None:

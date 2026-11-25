@@ -35,7 +35,7 @@ def pin_demo_reference_day(mp: pytest.MonkeyPatch) -> None:
 
 # files of the live data/ folder a test run must never change (decisions, proposals, portfolio, accounts)
 GUARDED_DATA = ("pending_changes.jsonl", "decision_log.jsonl", "saved_scenarios.jsonl", "business_audit.log",
-                "notifications.jsonl", "demo_users.json", "DerKurator_Demo_Portfolio.json",
+                "notifications.jsonl", "recovery.jsonl", "demo_users.json", "DerKurator_Demo_Portfolio.json",
                 "DerKurator_Demo_Portfolio.xlsx")
 _data_before: dict[str, str | None] = {}
 NOTIFY_SETTINGS = ("NOTIFY_ENABLED", "NOTIFY_SMTP_HOST", "NOTIFY_SMTP_PORT", "NOTIFY_SMTP_USER", "NOTIFY_SMTP_PASSWORD",
@@ -171,6 +171,7 @@ def isolated_state(tmp_path, monkeypatch):
     monkeypatch.setattr(logs, "PROPOSALS_LOG", tmp_path / "pending_changes.jsonl")
     monkeypatch.setattr(logs, "SCENARIOS_LOG", tmp_path / "saved_scenarios.jsonl")
     monkeypatch.setattr(logs, "NOTIFY_OUTBOX", tmp_path / "notifications.jsonl")
+    monkeypatch.setattr(logs, "RECOVERY_LOG", tmp_path / "recovery.jsonl")
     for name in NOTIFY_SETTINGS:  # a developer's mail or Teams settings never reach a test (notifications stay off)
         monkeypatch.delenv(name, raising=False)
     monkeypatch.setattr(logs, "ARCHIVE_DIR", tmp_path / "archive")

@@ -26,6 +26,9 @@ Rule order (first match decides the verdict; all CONDITIONAL reasons are collect
      management reserve below its floor, risk response costing more than it removes, accepted high/high risk,
      benefit realisation below benefit_realization_min_pct, a due benefit tranche without any actual,
      project merge (re-baseline of the target; second business unit or sponsor),
+     red trigger: a measure turns another project calculated red, leaves a cost gap above
+     recovery_min_gap_eur, takes from a donor carrying a highly weighted strategic goal, moves more than the
+     board threshold to the red project as a package, or stays just below the board threshold,
      other tool warnings)                                      -> CONDITIONAL GO
   5. simulation results without findings                       -> GO
   6. analysis only (no simulation)                             -> NO DECISION REQUIRED (analysis)
@@ -358,6 +361,7 @@ def _compute(sim_results: list[str], graph_results: list[str], facts: list[dict[
             reasons.append(f"Budget transfer of {_eur(abs(f['delta']))} from {f['project']} to {f['successor']} exceeds "
                            f"the board approval threshold of {_eur(threshold)}.")
             conditions.add(f"Obtain board approval for the budget transfer from {f['project']} to {f['successor']}.", SPONSOR)
+    _recovery_conditions(facts, rules, reasons, conditions)
     # structured fact only: a graph tool that answers again clears its earlier outage
     if any(f.get("type") == "graph_unavailable" for f in facts):
         reasons.append("Graph database unavailable – dependencies unchecked.")
@@ -388,6 +392,36 @@ def _compute(sim_results: list[str], graph_results: list[str], facts: list[dict[
                       f"schedule): {', '.join(informed)}.")
         return Verdict(GO, GO, tuple(go), (), snapshot)
     return _decided(NO_DECISION, "analysis", ("Analysis only – no change was simulated.",), (), snapshot)
+
+
+def _recovery_conditions(facts: list[dict[str, Any]], rules: BusinessRules, reasons: list[str],
+                         conditions: "_Conditions") -> None:
+    """Facts of the red trigger (app/recovery/evaluate.py): recorded by the code for a candidate measure or a package,
+    never by an LLM. Each is a condition, never silently a GO."""
+    for f in facts:
+        kind = f.get("type")
+        if kind == "collateral_red":
+            reasons.append(f"{f['successor']}: the measure turns it calculated red ({f.get('reason') or 'status check'}).")
+            conditions.add(f"Agree the measure with the sponsor of {f['successor']} before execution.", SPONSOR)
+        elif kind == "gap_not_closed":
+            reasons.append(f"{f['project']}: a cost gap of {_eur(f['remaining'])} remains after the measure "
+                           f"(threshold {_eur(rules.recovery_min_gap_eur)}).")
+            conditions.add(f"Cover the remaining gap of {_eur(f['remaining'])} on {f['project']}.", PMO)
+        elif kind == "donor_strategic":
+            goal = f"'{f['goal']}'" if f.get("goal") else "a strategic goal"
+            reasons.append(f"{f['successor']} gives up budget or capacity but carries {goal} "
+                           f"(weight {f.get('weight')}).")
+            conditions.add(f"Confirm with the portfolio board that {f['successor']} may give up resources despite its "
+                           "strategic goal.", SPONSOR)
+        elif kind == "package_board" and rules.board_approval_threshold_eur \
+                and (f.get("total") or 0) > rules.board_approval_threshold_eur:
+            reasons.append(f"{f['project']}: the measures of the package move {_eur(f['total'])} to the project in "
+                           f"total – above the board approval threshold of {_eur(rules.board_approval_threshold_eur)}.")
+            conditions.add(f"Obtain board approval for the package of {f['project']} as a whole.", SPONSOR)
+        elif kind == "threshold_near":
+            reasons.append(f"{f['project']}: a single step of {_eur(f['amount'])} stays just below the board approval "
+                           f"threshold of {_eur(f['threshold'])} – named on purpose, so it is not overlooked.")
+            conditions.add(f"Confirm that the split below the board threshold on {f['project']} is intended.", PMO)
 
 
 def verdict_rules_md() -> str:
