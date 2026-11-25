@@ -285,7 +285,7 @@ def project_detail(project_id: str, ctx: Scope = Depends(scope)) -> ProjectDetai
         "project": records(row)[0],
         "access": access,
         "tabs": ["Master data", "Status history", "Costs & baselines", "Benefits", "Schedule & dependencies", "Risks",
-                 "Data quality", *(["Edit"] if access == "edit" else [])],
+                 "Recommendations", "Data quality", *(["Edit"] if access == "edit" else [])],
         "header": _clean(figures),
         "missing_required": [EDITABLE_FIELDS[f].label if f in EDITABLE_FIELDS else f
                              for f in missing_required(project)],

@@ -191,6 +191,11 @@ async def render(info_: dict, query: dict) -> None:
     if page.get("message"):
         empty(page["message"])
         return
+    alerts = await _fetch("/recovery/alerts")  # red trigger: open recommendations of the caller's scope
+    if not isinstance(alerts, api.ApiError) and alerts["recommendations"]:
+        from frontends.nicegui.pages.recovery import alert_band
+
+        alert_band(alerts["recommendations"])
     _ok(risks, top_risks)
     _ok(page["kpis"], kpi_ribbon)
     async with boundary():
@@ -205,3 +210,6 @@ async def render(info_: dict, query: dict) -> None:
     ui.button("Decision insights", icon="insights", on_click=lambda: ui.navigate.to("/insights")) \
         .props("flat dense no-caps color=primary") \
         .tooltip("Status check of the sources, the portfolio with probabilities and the review of past decisions")
+    ui.button("Recovery", icon="healing", on_click=lambda: ui.navigate.to("/recovery")) \
+        .props("flat dense no-caps color=primary") \
+        .tooltip("Red trigger: recommendations with calculated options for projects that turned red")

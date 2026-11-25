@@ -19,7 +19,7 @@ ASSETS = Path(__file__).resolve().parent / "assets"  # the logo (favicon)
 
 # page id -> module under frontends.nicegui.pages (same ids as the React routes)
 PAGES = ("overview", "console", "approvals", "projects", "scenarios", "planning", "data_quality", "rules", "admin",
-         "insights")
+         "insights", "recovery")
 
 
 def _page_renderer(page_id: str):

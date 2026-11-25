@@ -77,6 +77,100 @@
     "title": "AdminFiles",
     "type": "object"
    },
+   "AdoptRequest": {
+    "properties": {
+     "option": {
+      "maxLength": 2,
+      "minLength": 1,
+      "title": "Option",
+      "type": "string"
+     }
+    },
+    "required": [
+     "option"
+    ],
+    "title": "AdoptRequest",
+    "type": "object"
+   },
+   "AdoptResult": {
+    "properties": {
+     "approval_mode": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Approval Mode"
+     },
+     "change_set": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Change Set",
+      "type": "array"
+     },
+     "chat_message_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Chat Message Id"
+     },
+     "option": {
+      "title": "Option",
+      "type": "string"
+     },
+     "recommendation_id": {
+      "title": "Recommendation Id",
+      "type": "string"
+     },
+     "request": {
+      "title": "Request",
+      "type": "string"
+     },
+     "run_id": {
+      "title": "Run Id",
+      "type": "string"
+     },
+     "steps": {
+      "title": "Steps",
+      "type": "integer"
+     },
+     "verdict": {
+      "anyOf": [
+       {
+        "additionalProperties": true,
+        "type": "object"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Verdict"
+     }
+    },
+    "required": [
+     "recommendation_id",
+     "option",
+     "run_id",
+     "request",
+     "verdict",
+     "change_set",
+     "approval_mode",
+     "steps",
+     "chat_message_id"
+    ],
+    "title": "AdoptResult",
+    "type": "object"
+   },
    "AgentModels": {
     "properties": {
      "main": {
@@ -133,6 +227,21 @@
      "shadow"
     ],
     "title": "AgentRow",
+    "type": "object"
+   },
+   "AnalyseRequest": {
+    "properties": {
+     "project_id": {
+      "maxLength": 64,
+      "minLength": 1,
+      "title": "Project Id",
+      "type": "string"
+     }
+    },
+    "required": [
+     "project_id"
+    ],
+    "title": "AnalyseRequest",
     "type": "object"
    },
    "AnalysisRun": {
@@ -3721,6 +3830,21 @@
      "differs"
     ],
     "title": "Difference",
+    "type": "object"
+   },
+   "DismissRequest": {
+    "properties": {
+     "reason": {
+      "maxLength": 1000,
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+     }
+    },
+    "required": [
+     "reason"
+    ],
+    "title": "DismissRequest",
     "type": "object"
    },
    "DqProfile": {
@@ -7444,6 +7568,18 @@
       ],
       "title": "Projects"
      },
+     "recommendation_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "The red-trigger recommendation the option came from",
+      "title": "Recommendation Id"
+     },
      "request": {
       "anyOf": [
        {
@@ -7677,6 +7813,278 @@
      "planned_total"
     ],
     "title": "Realisation",
+    "type": "object"
+   },
+   "Recommendation": {
+    "additionalProperties": true,
+    "properties": {
+     "candidates": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Candidates",
+      "type": "array"
+     },
+     "causes": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Causes",
+      "type": "array"
+     },
+     "explanation": {
+      "additionalProperties": true,
+      "title": "Explanation",
+      "type": "object"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "impact": {
+      "additionalProperties": true,
+      "title": "Impact",
+      "type": "object"
+     },
+     "not_possible": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Not Possible",
+      "type": "array"
+     },
+     "options": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Options",
+      "type": "array"
+     },
+     "project_id": {
+      "title": "Project Id",
+      "type": "string"
+     },
+     "project_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Name"
+     },
+     "proposals": {
+      "default": [],
+      "items": {
+       "type": "string"
+      },
+      "title": "Proposals",
+      "type": "array"
+     },
+     "recommended": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Recommended"
+     },
+     "rejected": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Rejected",
+      "type": "array"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     }
+    },
+    "required": [
+     "id",
+     "project_id",
+     "status",
+     "causes",
+     "impact",
+     "options",
+     "candidates",
+     "rejected",
+     "not_possible",
+     "explanation"
+    ],
+    "title": "Recommendation",
+    "type": "object"
+   },
+   "RecommendationList": {
+    "properties": {
+     "enabled": {
+      "description": "The business rule recovery_enabled",
+      "title": "Enabled",
+      "type": "boolean"
+     },
+     "recommendations": {
+      "items": {
+       "$ref": "#/components/schemas/RecommendationSummary"
+      },
+      "title": "Recommendations",
+      "type": "array"
+     }
+    },
+    "required": [
+     "enabled",
+     "recommendations"
+    ],
+    "title": "RecommendationList",
+    "type": "object"
+   },
+   "RecommendationSummary": {
+    "properties": {
+     "as_of": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "As Of"
+     },
+     "calculated": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Calculated"
+     },
+     "causes": {
+      "items": {
+       "type": "string"
+      },
+      "title": "Causes",
+      "type": "array"
+     },
+     "created_at": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Created At"
+     },
+     "gap_days": {
+      "title": "Gap Days",
+      "type": "integer"
+     },
+     "gap_eur": {
+      "title": "Gap Eur",
+      "type": "number"
+     },
+     "headline": {
+      "title": "Headline",
+      "type": "string"
+     },
+     "id": {
+      "title": "Id",
+      "type": "string"
+     },
+     "options": {
+      "title": "Options",
+      "type": "integer"
+     },
+     "project_id": {
+      "title": "Project Id",
+      "type": "string"
+     },
+     "project_name": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Project Name"
+     },
+     "recommended": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Recommended"
+     },
+     "reported": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Reported"
+     },
+     "status": {
+      "title": "Status",
+      "type": "string"
+     },
+     "trigger": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Trigger"
+     },
+     "trigger_label": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "title": "Trigger Label"
+     }
+    },
+    "required": [
+     "id",
+     "project_id",
+     "status",
+     "causes",
+     "gap_eur",
+     "gap_days",
+     "options",
+     "headline"
+    ],
+    "title": "RecommendationSummary",
     "type": "object"
    },
    "ReferenceForecast": {
@@ -9510,6 +9918,43 @@
      "steps"
     ],
     "title": "SavedWhatIf",
+    "type": "object"
+   },
+   "ScanLog": {
+    "properties": {
+     "chain": {
+      "additionalProperties": true,
+      "title": "Chain",
+      "type": "object"
+     },
+     "scans": {
+      "items": {
+       "additionalProperties": true,
+       "type": "object"
+      },
+      "title": "Scans",
+      "type": "array"
+     }
+    },
+    "required": [
+     "scans",
+     "chain"
+    ],
+    "title": "ScanLog",
+    "type": "object"
+   },
+   "ScanResult": {
+    "additionalProperties": true,
+    "properties": {
+     "enabled": {
+      "title": "Enabled",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "enabled"
+    ],
+    "title": "ScanResult",
     "type": "object"
    },
    "ScenarioBody": {
@@ -13170,6 +13615,18 @@
        }
       ],
       "title": "Projects"
+     },
+     "recommendation_id": {
+      "anyOf": [
+       {
+        "type": "string"
+       },
+       {
+        "type": "null"
+       }
+      ],
+      "description": "The red-trigger recommendation the option came from",
+      "title": "Recommendation Id"
      },
      "request": {
       "anyOf": [
@@ -18022,6 +18479,401 @@
     "summary": "Withdraw",
     "tags": [
      "proposals"
+    ]
+   }
+  },
+  "/api/v1/recovery/alerts": {
+   "get": {
+    "description": "The alert band of the overview. Opening it also starts the (idempotent) scan in the background.",
+    "operationId": "alerts_api_v1_recovery_alerts_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecommendationList"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "summary": "Alerts",
+    "tags": [
+     "recovery"
+    ]
+   }
+  },
+  "/api/v1/recovery/analyse": {
+   "post": {
+    "description": "'Analyse now' / 'Recalculate' (PMO): works for a project that is red already, also with the trigger off.",
+    "operationId": "analyse_api_v1_recovery_analyse_post",
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AnalyseRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "201": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Recommendation"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "summary": "Analyse",
+    "tags": [
+     "recovery"
+    ]
+   }
+  },
+  "/api/v1/recovery/projects/{project_id}": {
+   "get": {
+    "description": "The recommendations of one project (project detail, tab Recommendations), newest first.",
+    "operationId": "project_recommendations_api_v1_recovery_projects__project_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "project_id",
+      "required": true,
+      "schema": {
+       "title": "Project Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecommendationList"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "summary": "Project Recommendations",
+    "tags": [
+     "recovery"
+    ]
+   }
+  },
+  "/api/v1/recovery/recommendations": {
+   "get": {
+    "description": "PMO: every recommendation; a Project Manager: those of their own projects (other projects anonymised).",
+    "operationId": "recommendations_api_v1_recovery_recommendations_get",
+    "parameters": [
+     {
+      "in": "query",
+      "name": "status",
+      "required": false,
+      "schema": {
+       "anyOf": [
+        {
+         "pattern": "^(open|adopted|dismissed|superseded|expired)$",
+         "type": "string"
+        },
+        {
+         "type": "null"
+        }
+       ],
+       "title": "Status"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecommendationList"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "summary": "Recommendations",
+    "tags": [
+     "recovery"
+    ]
+   }
+  },
+  "/api/v1/recovery/recommendations/{rec_id}": {
+   "get": {
+    "operationId": "recommendation_api_v1_recovery_recommendations__rec_id__get",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "rec_id",
+      "required": true,
+      "schema": {
+       "title": "Rec Id",
+       "type": "string"
+      }
+     }
+    ],
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/Recommendation"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "summary": "Recommendation",
+    "tags": [
+     "recovery"
+    ]
+   }
+  },
+  "/api/v1/recovery/recommendations/{rec_id}/adopt": {
+   "post": {
+    "description": "Runs the option as a what-if in the caller's name (the Steering Console shows it, ready to submit). The PMO\nruns it with the quality gate overridden for the red project when the Data Steward holds it (audited).",
+    "operationId": "adopt_api_v1_recovery_recommendations__rec_id__adopt_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "rec_id",
+      "required": true,
+      "schema": {
+       "title": "Rec Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/AdoptRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/AdoptResult"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "summary": "Adopt",
+    "tags": [
+     "recovery"
+    ]
+   }
+  },
+  "/api/v1/recovery/recommendations/{rec_id}/dismiss": {
+   "post": {
+    "description": "Dismiss with a mandatory reason (PMO) – the reasons per lever feed the learning loop.",
+    "operationId": "dismiss_api_v1_recovery_recommendations__rec_id__dismiss_post",
+    "parameters": [
+     {
+      "in": "path",
+      "name": "rec_id",
+      "required": true,
+      "schema": {
+       "title": "Rec Id",
+       "type": "string"
+      }
+     }
+    ],
+    "requestBody": {
+     "content": {
+      "application/json": {
+       "schema": {
+        "$ref": "#/components/schemas/DismissRequest"
+       }
+      }
+     },
+     "required": true
+    },
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/RecommendationSummary"
+        }
+       }
+      },
+      "description": "Successful Response"
+     },
+     "422": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/HTTPValidationError"
+        }
+       }
+      },
+      "description": "Validation Error"
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "summary": "Dismiss",
+    "tags": [
+     "recovery"
+    ]
+   }
+  },
+  "/api/v1/recovery/scan": {
+   "post": {
+    "description": "Runs the watch now (PMO). Does nothing while the red trigger is off.",
+    "operationId": "scan_api_v1_recovery_scan_post",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ScanResult"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "summary": "Scan",
+    "tags": [
+     "recovery"
+    ]
+   }
+  },
+  "/api/v1/recovery/scans": {
+   "get": {
+    "description": "Admin Console › Logs › Recovery scans: the last scans and the hash chain of the recommendation store.",
+    "operationId": "scans_api_v1_recovery_scans_get",
+    "responses": {
+     "200": {
+      "content": {
+       "application/json": {
+        "schema": {
+         "$ref": "#/components/schemas/ScanLog"
+        }
+       }
+      },
+      "description": "Successful Response"
+     }
+    },
+    "security": [
+     {
+      "HTTPBearer": []
+     }
+    ],
+    "summary": "Scans",
+    "tags": [
+     "recovery"
     ]
    }
   },

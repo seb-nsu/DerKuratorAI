@@ -8,6 +8,7 @@ import { PlotlyFigure } from "../components/PlotlyFigure";
 import { Badge, Card, Empty, ErrorBox, Icon, PageHeader } from "../components/ui";
 import { eur, eurM, pct, short } from "./overview/format";
 import { Caption, Info, Metric, Section, useApi } from "./overview/parts";
+import { AlertBand, type RecList } from "./Recovery";
 
 type Page = Answer<"/api/v1/overview">;
 type Risks = Answer<"/api/v1/overview/top-risks">;
@@ -150,6 +151,7 @@ export function Overview() {
   const own = page?.data?.own_view;
   const items = useApi<OpenItems>(own === true ? "/overview/open-items" : null);
   const reserve = useApi<Reserve>(own === false && page?.data?.kpis ? "/overview/reserve" : null);
+  const alerts = useApi<RecList>("/recovery/alerts");
 
   if (!page) return <><PageHeader title="Overview" /><div className="muted" aria-busy="true">Loading …</div></>;
   if (page.error !== undefined || !page.data) return <><PageHeader title="Overview" /><ErrorBox message={page.error ?? ""} /></>;
@@ -161,6 +163,7 @@ export function Overview() {
         <Empty message={data.message ?? ""} />
       ) : (
         <>
+          {alerts?.data && <AlertBand items={alerts.data.recommendations} />}
           <h2>Top risks</h2>
           <Section state={risks}>{(r) => <TopRisks risks={r} />}</Section>
           <KpiRibbon k={data.kpis} />
@@ -179,6 +182,9 @@ export function Overview() {
               <Link className="row link-button" to="/insights"
                 title="Status check of the sources, the portfolio with probabilities and the review of past decisions">
                 <Icon name="insights" />Decision insights
+              </Link>
+              <Link className="row link-button" to="/recovery" title="The red trigger's recommendations with calculated options">
+                <Icon name="healing" />Recovery
               </Link>
             </>
           )}

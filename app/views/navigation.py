@@ -27,6 +27,7 @@ _PM = (
     ("planning", "My demands", "event_note", None),
     ("data_quality", "Data quality", "fact_check", "projects"),
     ("scenarios", "What-if comparison", "compare_arrows", "console"),
+    ("recovery", "Recommendations", "healing", "projects"),  # red trigger: own projects, adopt own-only options
 )
 _BOARD = (("planning", "Planning", "event_note", None),)  # the Portfolio Board reads the plan and approves it
 _ADMIN = (("admin", "Admin Console", "admin_panel_settings", None),)
