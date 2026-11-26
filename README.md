@@ -382,6 +382,14 @@ Console after a successful live test call).
   a hit rate, an audit pack per approved decision; projects from several sources at once, tasks from Microsoft
   Planner and monday.com, and (switched on) approved changes back to ServiceNow. `scripts/rule_lab.py` shows which
   verdicts a threshold change would flip before it is saved. See `docs/DATA_MAPPING.md`.
+- **Red trigger (portfolio recovery)** – when a project turns red (reported, or calculated by the status check) or its
+  cost gap grows again after an analysis, DerKurator diagnoses the causes, shows the impact on the portfolio
+  (dependents, deadlines, shared teams, reserve, Monte Carlo) and calculates up to four countermeasure packages
+  through the deterministic verdict engine, next to the reference "do nothing". Nothing changes automatically: the PMO
+  (or the PM, for an option that only touches their own project) adopts an option as a what-if, and a second PMO
+  approves. It shows up as an alert band on the overview, a Recovery page, a Recommendations tab on the project and a
+  section in the SteerCo pack; `scripts/recovery_scan.py` runs it on a schedule. Off by default
+  (business rule `recovery_enabled = 0`).
 - **Any data source** – a YAML mapping connects a JSON file, an Excel workbook or a CSV folder with other column
   names, values and units; an import report shows what was mapped and what is missing. **ServiceNow** directly:
   the SPM tables through the Table API into a local snapshot, later syncs read only the changes.
