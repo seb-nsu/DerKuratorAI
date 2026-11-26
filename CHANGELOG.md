@@ -6,6 +6,20 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/); the
 
 ## [Unreleased]
 
+### Added
+- **Red trigger (portfolio recovery, concept R1–R11 of 24.11.2026).** When a project turns red – reported or calculated
+  (status check) – or its cost gap grows by more than `recovery_regap_pct` after an analysis, DerKurator diagnoses the
+  causes, shows the impact on the portfolio (dependents, deadlines, shared teams, reserve, Monte Carlo) and calculates
+  up to four options as packages through the deterministic verdict engine (least intervention via a 0-1 programme,
+  fastest effect, portfolio rebuild, schedule, capacity, risk; plus the reference "do nothing"). The board threshold
+  applies to the sum of a package; a step just below it is named. Nothing is changed automatically: the PMO or the PM
+  of the red project (only for an option that changes their own project alone) adopts an option as a what-if,
+  submits it, and a second PMO approves. New: `app/recovery/`, `/api/v1/recovery/*`, the Recovery page (NiceGUI and
+  React), the alert band on the overview, the project tab Recommendations, the notification `red_trigger`, the
+  SteerCo pack section "Red projects and recommended countermeasures", the learning loop on Decision insights,
+  `scripts/recovery_scan.py` for the scheduler and the business rules `recovery_*` (off by default:
+  `recovery_enabled = 0`). The recommendation store `data/recovery.jsonl` is hash-chained.
+
 ### Removed
 - **Streamlit front end.** NiceGUI and React are the only front ends; both run on the HTTP API. Removed: the Streamlit
   app (`app/main.py`, `app/ui/`), `.streamlit/config.toml`, `start_streamlit.bat`, `scripts/smoke_test.py`, the

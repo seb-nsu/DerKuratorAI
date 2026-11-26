@@ -25,6 +25,7 @@ data/business_audit.log
 data/saved_scenarios.jsonl
 data/pending_changes.jsonl
 data/notifications.jsonl
+data/recovery.jsonl
 data/*.lock
 data/*.writelock
 data/mappings/*.store.json

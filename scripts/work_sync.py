@@ -28,6 +28,11 @@ def main(argv: list[str]) -> int:
         return 1
     for report in reports:
         print(report.summary())
+    if reports and any(r.ok for r in reports):
+        from app.recovery.hooks import enabled, scan_now
+
+        if enabled():  # red trigger: the synced data may have turned a project red
+            print(f"Red trigger scan: {scan_now('sync').get('stored', [])}")
     return 0 if all(r.ok for r in reports) else 1
 
 

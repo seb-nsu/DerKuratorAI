@@ -80,6 +80,8 @@ async def render_detail(pid: str, d: dict, tab: str | None) -> None:
                 _schedule(d)
             with ui.tab_panel("Risks"):
                 _risks(pid, d)
+            with ui.tab_panel("Recommendations"):
+                await _recommendations(pid)
             with ui.tab_panel("Data quality"):
                 _data_quality(findings)
             if "Edit" in names:
@@ -90,6 +92,26 @@ async def render_detail(pid: str, d: dict, tab: str | None) -> None:
         if d["access"] != "edit":
             caption("Read-only – master data is maintained by the owning Project Manager.", "lock")
     await ask_box("project", project_id=pid, title="Ask about this project")
+
+
+async def _recommendations(pid: str) -> None:
+    """Red trigger: the recommendations of this project, read-only, newest first (actions on the Recovery page)."""
+    try:
+        answer = await api.get(f"/recovery/projects/{pid}")
+    except api.ApiError as exc:
+        caption(exc.message)
+        return
+    items = answer["recommendations"]
+    if not items:
+        caption("No recommendation of the red trigger for this project.")
+        return
+    table([("Created", "Created"), ("Status", "Status"), ("Trigger", "Trigger"), ("Causes", "Causes"),
+           ("Options", "Options"), ("Recommended", "Recommended")],
+          [{"Created": (i.get("created_at") or "")[:16], "Status": i["status"], "Trigger": i.get("trigger_label"),
+            "Causes": ", ".join(i["causes"]), "Options": i["options"], "Recommended": i.get("recommended") or "–"}
+           for i in items])
+    ui.button("Open on the Recovery page", icon="healing",
+              on_click=lambda: ui.navigate.to(f"/recovery?id={items[0]['id']}")).props("flat no-caps color=primary")
 
 
 def _key_figures(h: dict) -> None:

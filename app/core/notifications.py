@@ -44,6 +44,7 @@ from app.core import clock, logs
 logger = logging.getLogger("derkurator.notifications")
 
 SUBMITTED, ESCALATED, EXPIRED, DECIDED, TEST = "submitted", "escalated", "expired", "decided", "test"
+RED_TRIGGER = "red_trigger"  # a project turned red: the recommendation of app/recovery waits for the PMO
 MAIL, TEAMS = "mail", "teams"
 PMO_CHANNEL, BOARD_CHANNEL = "PMO", "Portfolio Board"  # the `to` of a Teams message: the role, never the URL
 RETRY_BASE_S, RETRY_MAX_S = 60, 6 * 3600
@@ -193,6 +194,27 @@ def record_event(event: str, proposal_id: str, level: int | None = None, status:
     try:
         kick()
     except Exception:  # no thread now: the next event or the scheduled script delivers it
+        logger.exception("Notification delivery could not be started")
+
+
+def record_red_trigger(recommendation_id: str, key: str) -> None:
+    """Records that a project turned red and its recommendation waits (one notification per idempotency key of the
+    trigger). Never raises."""
+    if not enabled() or not channels_configured():
+        return
+    event_key = f"{RED_TRIGGER}:{key}"
+    try:
+        with _locked() as path:
+            if any(r.get("type") == "event" and r.get("key") == event_key for r in _records(path)):
+                return
+            _append(path, {"type": "event", "key": event_key, "event": RED_TRIGGER,
+                           "recommendation_id": recommendation_id})
+    except Exception:  # the recommendation is stored; the notice is best effort
+        logger.exception("Red trigger notification %s could not be recorded", event_key)
+        return
+    try:
+        kick()
+    except Exception:
         logger.exception("Notification delivery could not be started")
 
 
@@ -359,8 +381,24 @@ def _expand(path: Path, records: list[dict[str, Any]]) -> int:
     known = {r.get("dedup") for r in records if r.get("type") == "queued"}
     dataset, loaded, queued = None, False, 0
     for event in pending:
-        proposal = get_proposal(str(event.get("proposal_id")))
         out: list[dict[str, Any]] = []
+        if event.get("event") == RED_TRIGGER:
+            from app.recovery.notify import messages_for
+
+            if not loaded:
+                dataset, loaded = _dataset(), True
+            for r, message in messages_for(event, dataset):
+                dedup = f"{event['key']}|{r.channel}|{r.to.casefold()}"
+                if dedup in known:
+                    continue
+                known.add(dedup)
+                out.append({"type": "queued", "id": uuid.uuid4().hex[:12], "key": event["key"], "dedup": dedup,
+                            "channel": r.channel, "to": r.to, "user": r.user, **message})
+            with _locked():
+                _append(path, *out, {"type": "expanded", "key": event["key"], "messages": len(out)})
+            queued += len(out)
+            continue
+        proposal = get_proposal(str(event.get("proposal_id")))
         if proposal is not None and not (event["event"] in (SUBMITTED, ESCALATED) and proposal["status"] not in OPEN):
             if not loaded:
                 dataset, loaded = _dataset(), True

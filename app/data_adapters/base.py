@@ -506,6 +506,9 @@ def _record_commit(user, role, reason, proposal_id, result: ApplyResult) -> None
     except logs.AuditWriteError:
         logging.getLogger(__name__).error("Write %s applied, but its committed record is missing",
                                           result.operation_id)
+    from app.recovery.hooks import scan_in_background
+
+    scan_in_background("write")  # red trigger: did the write turn a project red? (background, never raises)
 
 
 def _record_write_failure(user, role, reason, proposal_id, snapshot_id, exc: Exception,

@@ -102,6 +102,7 @@ def decision_review(review: dict) -> None:
         table([{"Verdict": h["verdict"], "Decisions": h["decisions"], "Held": h["held"],
                 "Hit rate %": h["hit_rate_pct"]} for h in review["hit_rate"]],
               formats={"Hit rate %": "dec1"}, caption="Hit rate per verdict")
+    recommendations(review.get("recommendations") or {})
     if not review["decisions"]:
         info("No approved decision yet.")
         return
@@ -115,6 +116,18 @@ def decision_review(review: dict) -> None:
             .classes("w-64")
         ui.button("Download audit pack", icon="inventory_2", on_click=lambda: _download_pack(choice.value)) \
             .props("outline no-caps")
+
+
+def recommendations(loop: dict) -> None:
+    """Red trigger learning loop: adopted recommendations 6/12 months on, dismissal reasons per measure."""
+    if not loop.get("adopted") and not loop.get("dismissed_by_measure"):
+        return
+    rate = loop.get("recovery_rate_pct")
+    caption(f"Red trigger: {len(loop.get('adopted') or [])} recommendation(s) adopted · {loop.get('recovered', 0)} of "
+            f"{loop.get('judged', 0)} reviewed back out of red" + (f" ({rate:g} %)" if rate is not None else ""))
+    if loop.get("dismissed_by_measure"):
+        table([{"Measure": m["measure"], "Dismissed": m["dismissed"], "Reasons": "; ".join(m["reasons"])}
+               for m in loop["dismissed_by_measure"]], scroll=True, caption="Dismissed recommendations per measure")
 
 
 def transfers(rows: list[dict]) -> None:

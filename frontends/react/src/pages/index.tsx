@@ -8,12 +8,13 @@ import { Admin } from "./Admin";
 import { Approvals } from "./Approvals";
 import { Insights } from "./Insights";
 import { Projects } from "./Projects";
+import { Recovery } from "./Recovery";
 import { Console } from "./Console";
 import { Planning } from "./Planning";
 import { RulesPage } from "./Rules";
 import { WhatIfComparison } from "./WhatIfComparison";
 
-export const PAGE_IDS = ["overview", "console", "approvals", "projects", "scenarios", "planning", "data_quality", "rules", "admin", "insights"] as const;
+export const PAGE_IDS = ["overview", "console", "approvals", "projects", "scenarios", "planning", "data_quality", "rules", "admin", "insights", "recovery"] as const;
 
 const built: Partial<Record<(typeof PAGE_IDS)[number], ComponentType>> = {
   overview: Overview,
@@ -26,6 +27,7 @@ const built: Partial<Record<(typeof PAGE_IDS)[number], ComponentType>> = {
   planning: Planning,
   rules: RulesPage,
   insights: Insights,
+  recovery: Recovery,
 };
 
 export function pageComponent(id: (typeof PAGE_IDS)[number]): ComponentType {

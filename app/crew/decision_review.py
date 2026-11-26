@@ -121,3 +121,38 @@ def review_decisions(proposals: list[dict[str, Any]], projects: pd.DataFrame, to
     return {"as_of": today.isoformat(), "decisions": decisions, "hit_rate": hit_rate,
             "due_for_review": sum(1 for d in decisions if d["review_stage"]),
             "conditions_overdue": sum(len(d["conditions_to_check"]) for d in decisions)}
+
+
+def review_recommendations(recommendations: list[dict[str, Any]], status: dict[str, dict[str, Any]],
+                           today: date | None = None) -> dict[str, Any]:
+    """Learning loop of the red trigger: did an adopted recommendation bring its project back out of red (6 and
+    12 months after the adoption), and why were recommendations dismissed – counted per measure (the actions of the
+    recommended option). `status`: project id -> {"reported", "calculated"} of today's status check; a project that
+    is closed or no longer in the data counts as "unknown"."""
+    today = today or clock.today()
+    adopted, reasons = [], {}
+    for rec in recommendations:
+        if rec.get("status") == "adopted" and rec.get("adopted_at"):
+            decided = _day(rec["adopted_at"])
+            if decided is None:
+                continue
+            age = (today - decided).days
+            stage = "12 months" if age >= REVIEW_AFTER_DAYS[1] else "6 months" if age >= REVIEW_AFTER_DAYS[0] else None
+            now = status.get(str(rec.get("project_id")))
+            red = None if now is None else "Red" in (now.get("reported"), now.get("calculated"))
+            adopted.append({"recommendation_id": rec.get("id"), "project_id": rec.get("project_id"),
+                            "option": rec.get("adopted_option"), "adopted_on": decided.isoformat(), "age_days": age,
+                            "review_stage": stage, "status_now": None if now is None else now.get("calculated"),
+                            "recovered": None if red is None or stage is None else not red})
+        elif rec.get("status") == "dismissed":
+            best = next((o for o in rec.get("options") or [] if o.get("key") == rec.get("recommended")), None)
+            for action in dict.fromkeys(s.get("action") for s in (best or {}).get("steps") or []):
+                entry = reasons.setdefault(str(action), {"measure": str(action), "dismissed": 0, "reasons": []})
+                entry["dismissed"] += 1
+                entry["reasons"].append(str(rec.get("dismiss_reason") or ""))
+    judged = [a for a in adopted if a["recovered"] is not None]
+    return {"as_of": today.isoformat(), "adopted": adopted,
+            "recovered": sum(1 for a in judged if a["recovered"]), "judged": len(judged),
+            "recovery_rate_pct": round(sum(1 for a in judged if a["recovered"]) / len(judged) * 100, 1) if judged
+            else None,
+            "dismissed_by_measure": sorted(reasons.values(), key=lambda e: (-e["dismissed"], e["measure"]))}

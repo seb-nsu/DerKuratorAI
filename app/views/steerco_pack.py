@@ -112,7 +112,10 @@ def _proposal_flag(proposal_id: str, fallback: str | None) -> str:
     return f"Submitted for PMO approval (proposal {proposal_id})."
 
 
-def pack_data(message: dict[str, Any], requester: str = "", environment: str = "") -> dict[str, Any]:
+def pack_data(message: dict[str, Any], requester: str = "", environment: str = "",
+              red_projects: list[dict[str, Any]] | None = None) -> dict[str, Any]:
+    """`red_projects`: the open and adopted red trigger recommendations (app.views.recovery.steerco_rows) – the
+    section "Red projects and recommended countermeasures", from the data, never from LLM text."""
     meta = message.get("meta") or {}
     paper = str(message.get("content") or "")
     changes = meta.get("proposed_changes") or []
@@ -145,7 +148,7 @@ def pack_data(message: dict[str, Any], requester: str = "", environment: str = "
         # stored proposals carry only the verdict label, so fall back to the rule-based reasons written into the paper
         "reasons": list((engine or {}).get("reasons") or []) or re.findall(r"(?m)^\s*-\s*Reason:\s*(.+?)\s*$", paper),
         "changes": changes, "requester": requester, "environment": environment, "mode": meta.get("mode", "?"),
-        "generated": clock.now().strftime("%Y-%m-%d %H:%M"),
+        "generated": clock.now().strftime("%Y-%m-%d %H:%M"), "red_projects": list(red_projects or []),
     }
 
 
@@ -173,6 +176,11 @@ def render_pack_html(data: dict[str, Any]) -> str:
     conditions = "".join(f"<li>{e(c)}</li>" for c in data["conditions"]) or "<li>No conditions stated.</li>"
     reasons = "".join(f"<li>{e(r)}</li>" for r in data.get("reasons") or [])
     flags = "".join(f"<li>{e(f)}</li>" for f in data["flags"])
+    red = "".join(f"<tr><td>{e(str(r.get('project_id')))} {e(str(r.get('project_name') or ''))}</td>"
+                  f"<td>{e(', '.join(r.get('causes') or []) or '–')}</td><td>{e(eur(r.get('gap_eur') or 0))}</td>"
+                  f"<td>{e(str(r.get('status')))}</td><td>{e(str(r.get('option_key') or '–'))} "
+                  f"{e(str(r.get('option') or ''))}</td><td>{e(str(r.get('verdict') or '–'))}</td></tr>"
+                  for r in data.get("red_projects") or [])
     rows = "".join(
         "<tr>" + "".join(f"<td>{e(str(r[k]) if r[k] not in (None, '') else '–')}</td>" for k in CHANGE_COLUMNS) + "</tr>"
         for r in change_rows(data["changes"])) or f'<tr><td colspan="{len(CHANGE_COLUMNS)}">No data changes proposed.</td></tr>'
@@ -204,6 +212,7 @@ def render_pack_html(data: dict[str, Any]) -> str:
 {f'<h2>Why this verdict (rule-based)</h2><ul>{reasons}</ul>' if reasons else ''}
 <h2>Conditions &amp; next steps</h2><ul>{conditions}</ul>
 {f'<h2>Flags</h2><ul class="flags">{flags}</ul>' if flags else ''}
+{f'<h2>Red projects and recommended countermeasures</h2><table><thead><tr><th>Project</th><th>Causes</th><th>Cost gap</th><th>Status</th><th>Option</th><th>Verdict</th></tr></thead><tbody>{red}</tbody></table>' if red else ''}
 <h2>Change set</h2>
 <table><thead><tr>{''.join(f'<th>{e(c)}</th>' for c in CHANGE_COLUMNS)}</tr></thead><tbody>{rows}</tbody></table>
 <footer>DerKurator AI – decision support. Figures are calculated by deterministic tools; items marked AI estimate are

@@ -10,7 +10,7 @@ from typing import Any
 from app.core import clock
 from app.core.proposals import APPROVED, get_proposal, list_proposals
 from app.core.security import ROLE_ADMIN, ROLE_PMO
-from app.crew.decision_review import review_decisions
+from app.crew.decision_review import review_decisions, review_recommendations
 from app.crew.tools.forecast_ranges import project_reference, simulate_portfolio
 from app.crew.tools.status_check import check_dataset
 
@@ -37,7 +37,19 @@ def decision_review(dataset: Any, today: date | None = None) -> dict[str, Any]:
     """Approved proposals of the dataset's projects only (a proposal naming a project outside it is left out)."""
     visible = set(dataset.projects["project_number"].astype(str)) if not dataset.projects.empty else set()
     proposals = [p for p in list_proposals(status=APPROVED) if set(map(str, p.get("projects") or [])) <= visible]
-    return review_decisions(proposals, dataset.projects, today or clock.today())
+    today = today or clock.today()
+    review = review_decisions(proposals, dataset.projects, today)
+    review["recommendations"] = recommendation_review(dataset, today, visible)
+    return review
+
+
+def recommendation_review(dataset: Any, today: date, visible: set[str]) -> dict[str, Any]:
+    """Learning loop of the red trigger over the recommendations of the dataset's projects."""
+    from app.recovery import store
+
+    status = {c.project_id: {"reported": c.reported, "calculated": c.calculated} for c in check_dataset(dataset, today)}
+    recs = [r for r in store.list_recommendations() if str(r.get("project_id")) in visible]
+    return review_recommendations(recs, status, today)
 
 
 def audit_pack(proposal_id: str, user: str, role: str, dataset: Any) -> tuple[str, bytes]:

@@ -8,6 +8,7 @@ import { AskBox } from "../../components/AskBox";
 import { PlotlyFigure } from "../../components/PlotlyFigure";
 import { Badge, Card, Icon, Kpi } from "../../components/ui";
 import { tone, type Tone } from "../../theme";
+import { ProjectRecommendations } from "../Recovery";
 import { EditForm } from "./EditForm";
 import { Caption, DataTable, cell, consoleUrl, eur, titled, type Flash } from "./common";
 
@@ -101,6 +102,7 @@ export function ProjectDetail({ pid, detail: d, done }: { pid: string; detail: D
           {current === "Benefits" && <Benefits pid={pid} d={d} done={done} onReview={() => go("benefit_review")} />}
           {current === "Schedule & dependencies" && <Schedule d={d} />}
           {current === "Risks" && <Risks d={d} onPlan={(risk) => go("risk_response", { risk })} />}
+          {current === "Recommendations" && <ProjectRecommendations projectId={pid} />}
           {current === "Data quality" && (findings.length ? (
             <DataTable caption="Data Steward findings" columns={titled(["Severity", "Rule", "Field", "Finding"])}
               rows={findings.map((f, i) => ({ _key: String(i), Severity: f.severity, Rule: f.rule_label, Field: f.field_label || "–", Finding: f.message }))} />

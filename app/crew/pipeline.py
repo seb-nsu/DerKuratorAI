@@ -541,6 +541,7 @@ def run_steering_pipeline(
     on_paper=None,
     as_of: date | None = None,
     use_llm: bool = True,
+    force_projects: set[str] | None = None,
 ) -> PipelineResult:
     """UI entry point. `dataset` must already be RLS-filtered.
     `plan`: exact plan from the guided Steering Console (skips intent parsing / orchestrator).
@@ -553,7 +554,9 @@ def run_steering_pipeline(
     LLM paper is streamed (masked, complete lines). Without the callbacks the result is the same, just at the end.
     `as_of`: reference date of every date-dependent calculation (default today); it is stored with the verdict, so
     the same request with the same `as_of` gives the same verdict on any system day. `use_llm=False`: the rule-based
-    path only (the quick calculation of the question boxes) – same verdict, no LLM call, no shadow run."""
+    path only (the quick calculation of the question boxes) – same verdict, no LLM call, no shadow run.
+    `force_projects`: with `force`, the quality gate is overridden for these projects only (the red trigger forces
+    the red project itself, never a blocked donor); None overrides it for every blocked project."""
     from app.core.security import ROLE_PMO
 
     guided_plan = plan
@@ -592,8 +595,11 @@ def run_steering_pipeline(
             )
 
         # 2) Scenario context: only PII-masked data reaches tools/LLMs; quality gate for blocked projects
-        forced = sorted(steward.blocked_reasons) if force else []
-        blocked = {} if force else steward.blocked_reasons
+        overridden = set(steward.blocked_reasons) if force_projects is None else \
+            set(steward.blocked_reasons) & {str(p) for p in force_projects}
+        forced = sorted(overridden) if force else []
+        blocked = {k: v for k, v in steward.blocked_reasons.items() if k not in overridden} if force \
+            else steward.blocked_reasons
         if forced:
             logger.warning("Forced simulation by %s (%s) overriding quality gate for %s", user_id, role, ", ".join(forced))
             warnings.append(forced_notice(forced))

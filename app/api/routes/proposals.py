@@ -38,7 +38,7 @@ router = APIRouter(tags=["proposals"])
 
 SUMMARY_FIELDS = ("id", "timestamp", "requester", "requester_role", "status", "verdict", "request", "projects",
                   "changes", "forced", "justification", "comment", "decided_by", "decided_at", "escalation_level",
-                  "snapshot_id", "reverts", "override", "on_behalf_of", "kind")
+                  "snapshot_id", "reverts", "override", "on_behalf_of", "kind", "recommendation_id")
 
 
 class Change(BaseModel):
@@ -77,6 +77,7 @@ class ProposalSummary(BaseModel):
     override: bool | None = None
     on_behalf_of: str | None = None
     kind: str | None = None
+    recommendation_id: str | None = Field(None, description="The red-trigger recommendation the option came from")
     deadline: str = Field(description="on time | overdue | overdue x2 | expires | closed | unknown")
     due: str | None = None
     expires: str | None = None
@@ -268,10 +269,15 @@ def submit(body: Submission, user: User = Depends(requester), ctx: Scope = Depen
     try:
         entry = submit_proposal(user.user_id, user.role, run["request"], run["paper"], label, changes,
                                 forced=run.get("forced", False), verdict_record=run.get("verdict"),
-                                justification=body.justification)
+                                justification=body.justification,
+                                recommendation_id=run.get("recommendation_id"))
     except ProposalError as exc:
         raise HTTPException(status.HTTP_409_CONFLICT, f"Proposal not submitted: {exc}") from exc
     runs.pop(body.run_id)  # one proposal per run
+    if run.get("recommendation_id"):  # the red-trigger recommendation names its proposal (learning loop)
+        from app.recovery import store as recovery_store
+
+        recovery_store.link_proposal(run["recommendation_id"], entry["id"], user.user_id)
     if run.get("chat_message_id"):  # the shared chat shows it as submitted, so no front end offers it again
         update_message(user.role, user.user_id, run["chat_message_id"],
                        {"proposal_id": entry["id"], "proposal_status": SUBMITTED})

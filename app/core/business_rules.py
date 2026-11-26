@@ -85,6 +85,17 @@ class BusinessRules(BaseModel):
     simulation_runs: int = Field(2000, ge=100, le=20_000)
     confidence_level_pct: float = Field(80.0, ge=50, le=99)
     reference_class_min_projects: int = Field(5, ge=2, le=100)
+    # --- red trigger (recovery recommendations when a project turns red)
+    recovery_enabled: int = Field(0, ge=0, le=1)
+    recovery_trigger_calculated: int = Field(1, ge=0, le=1)
+    recovery_min_gap_eur: float = Field(25_000.0, ge=0, le=1e12)
+    recovery_regap_pct: float = Field(25.0, ge=1, le=1_000)
+    recovery_max_candidates: int = Field(12, ge=1, le=50)
+    recovery_max_donors: int = Field(3, ge=1, le=10)
+    recovery_max_scope_cut_pct: float = Field(30.0, ge=0, le=90)
+    recovery_ttl_days: int = Field(14, ge=1, le=365)
+    recovery_threshold_avoidance_flag: int = Field(1, ge=0, le=1)
+    recovery_threshold_margin_pct: float = Field(10.0, ge=0, le=50)
 
     @model_validator(mode="after")
     def _limits_fit_together(self) -> "BusinessRules":
@@ -160,6 +171,16 @@ RULE_LABELS: dict[str, tuple[str, str, str]] = {
     "confidence_level_pct": ("Confidence level of forecast ranges", "%", "P80 by default: the value that 80 % of the outcomes stay below."),
     "reference_class_min_projects": ("Min. size of a reference class", "projects", "Smaller classes widen to the whole portfolio and say so."),
     "risk_response_min_benefit_ratio": ("Min. exposure reduction per € of risk response", "ratio", "A response that removes less exposure than this × its cost is a CONDITIONAL GO."),
+    "recovery_enabled": ("Red trigger: analyse projects that turn red", "(1 = on, 0 = off)", "A project turning red starts a recovery analysis with calculated options; nothing is written without a proposal."),
+    "recovery_trigger_calculated": ("Red trigger: also on a calculated red", "(1 = on, 0 = off)", "Besides the reported status, the calculated status of the status check starts the analysis."),
+    "recovery_min_gap_eur": ("Red trigger: smallest cost gap with options", "€", "A smaller cost gap gets an impact report but no options."),
+    "recovery_regap_pct": ("Red trigger: re-analyse a red project when its gap grows by", "%", "A project already red is analysed again when its gap grew this much since the last analysis."),
+    "recovery_max_candidates": ("Red trigger: max. candidate measures per trigger", "candidates", "Upper bound of the single measures that are calculated."),
+    "recovery_max_donors": ("Red trigger: max. donor projects per option", "projects", "Projects that give budget or capacity to one option."),
+    "recovery_max_scope_cut_pct": ("Red trigger: largest scope reduction proposed", "%", "Upper bound of a proposed scope reduction of the red project."),
+    "recovery_ttl_days": ("Red trigger: an open recommendation expires after", "days", "After this an open recommendation is closed as expired (the data may have changed)."),
+    "recovery_threshold_avoidance_flag": ("Red trigger: flag options just below an approval threshold", "(1 = on, 0 = off)", "An option whose single step stays just below the board threshold is marked, so it cannot pass unnoticed."),
+    "recovery_threshold_margin_pct": ("Red trigger: 'just below' a threshold means within", "% of the threshold", "Used by the flag above."),
 }
 
 

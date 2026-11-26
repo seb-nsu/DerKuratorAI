@@ -34,7 +34,8 @@ def test_pages_follow_the_role(client, monkeypatch):
     pm = client.get("/api/v1/workspace", headers=sign_in(client, PM)).json()
     nav = [p["title"] for p in pm["pages"] if not p["parent"]]
     assert nav == ["Overview", "My projects", "Steering Console", "My proposals", "My demands"]
-    assert {p["id"]: p["parent"] for p in pm["pages"] if p["parent"]} == {"data_quality": "projects", "scenarios": "console"}
+    assert {p["id"]: p["parent"] for p in pm["pages"] if p["parent"]} == {"data_quality": "projects", "scenarios": "console",
+                                                                      "recovery": "projects"}
     assert pm["scope"] == {"visible": 2, "total": None} and pm["pending_approvals"] == 0  # no portfolio total for a PM
     assert pm["user"]["pmo_head"] is False
     pmo = client.get("/api/v1/workspace", headers=sign_in(client, PMO)).json()

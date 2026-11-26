@@ -7,7 +7,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.responses import Response
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 from app.api.deps import Scope, pmo, scope
 from app.core.auth import User
@@ -63,6 +63,9 @@ class DecisionReview(BaseModel):
     hit_rate: list[dict[str, Any]]
     due_for_review: int
     conditions_overdue: int
+    recommendations: dict[str, Any] = Field(default_factory=dict,
+                                            description="Red trigger learning loop: adopted recommendations 6/12 "
+                                                        "months on, dismissal reasons per measure")
 
 
 class Transfer(_Open):

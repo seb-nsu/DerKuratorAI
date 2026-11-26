@@ -1895,6 +1895,184 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/recovery/alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Alerts
+         * @description The alert band of the overview. Opening it also starts the (idempotent) scan in the background.
+         */
+        get: operations["alerts_api_v1_recovery_alerts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recovery/analyse": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Analyse
+         * @description 'Analyse now' / 'Recalculate' (PMO): works for a project that is red already, also with the trigger off.
+         */
+        post: operations["analyse_api_v1_recovery_analyse_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recovery/projects/{project_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Project Recommendations
+         * @description The recommendations of one project (project detail, tab Recommendations), newest first.
+         */
+        get: operations["project_recommendations_api_v1_recovery_projects__project_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recovery/recommendations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Recommendations
+         * @description PMO: every recommendation; a Project Manager: those of their own projects (other projects anonymised).
+         */
+        get: operations["recommendations_api_v1_recovery_recommendations_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recovery/recommendations/{rec_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Recommendation */
+        get: operations["recommendation_api_v1_recovery_recommendations__rec_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recovery/recommendations/{rec_id}/adopt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Adopt
+         * @description Runs the option as a what-if in the caller's name (the Steering Console shows it, ready to submit). The PMO
+         *     runs it with the quality gate overridden for the red project when the Data Steward holds it (audited).
+         */
+        post: operations["adopt_api_v1_recovery_recommendations__rec_id__adopt_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recovery/recommendations/{rec_id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Dismiss
+         * @description Dismiss with a mandatory reason (PMO) – the reasons per lever feed the learning loop.
+         */
+        post: operations["dismiss_api_v1_recovery_recommendations__rec_id__dismiss_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recovery/scan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Scan
+         * @description Runs the watch now (PMO). Does nothing while the red trigger is off.
+         */
+        post: operations["scan_api_v1_recovery_scan_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/recovery/scans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Scans
+         * @description Admin Console › Logs › Recovery scans: the last scans and the hash chain of the recommendation store.
+         */
+        get: operations["scans_api_v1_recovery_scans_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/sign-in-info": {
         parameters: {
             query?: never;
@@ -2217,6 +2395,36 @@ export interface components {
             /** Test Report */
             test_report: string;
         };
+        /** AdoptRequest */
+        AdoptRequest: {
+            /** Option */
+            option: string;
+        };
+        /** AdoptResult */
+        AdoptResult: {
+            /** Approval Mode */
+            approval_mode: string | null;
+            /** Change Set */
+            change_set: {
+                [key: string]: unknown;
+            }[];
+            /** Chat Message Id */
+            chat_message_id: string | null;
+            /** Option */
+            option: string;
+            /** Recommendation Id */
+            recommendation_id: string;
+            /** Request */
+            request: string;
+            /** Run Id */
+            run_id: string;
+            /** Steps */
+            steps: number;
+            /** Verdict */
+            verdict: {
+                [key: string]: unknown;
+            } | null;
+        };
         /** AgentModels */
         AgentModels: {
             /** Main */
@@ -2234,6 +2442,11 @@ export interface components {
             main: string;
             /** Shadow */
             shadow: string;
+        };
+        /** AnalyseRequest */
+        AnalyseRequest: {
+            /** Project Id */
+            project_id: string;
         };
         /** AnalysisRun */
         AnalysisRun: {
@@ -3194,6 +3407,13 @@ export interface components {
             hit_rate: {
                 [key: string]: unknown;
             }[];
+            /**
+             * Recommendations
+             * @description Red trigger learning loop: adopted recommendations 6/12 months on, dismissal reasons per measure
+             */
+            recommendations?: {
+                [key: string]: unknown;
+            };
         };
         /** Delegation */
         Delegation: {
@@ -3435,6 +3655,11 @@ export interface components {
             field_label: string;
             /** Project */
             project: string;
+        };
+        /** DismissRequest */
+        DismissRequest: {
+            /** Reason */
+            reason: string;
         };
         /** DqProfile */
         DqProfile: {
@@ -4694,6 +4919,11 @@ export interface components {
             };
             /** Projects */
             projects?: string[] | null;
+            /**
+             * Recommendation Id
+             * @description The red-trigger recommendation the option came from
+             */
+            recommendation_id?: string | null;
             /** Request */
             request?: string | null;
             /** Requester */
@@ -4767,6 +4997,99 @@ export interface components {
             tranches: components["schemas"]["Tranche"][];
             /** Unassigned */
             unassigned: number;
+        };
+        /** Recommendation */
+        Recommendation: {
+            /** Candidates */
+            candidates: {
+                [key: string]: unknown;
+            }[];
+            /** Causes */
+            causes: {
+                [key: string]: unknown;
+            }[];
+            /** Explanation */
+            explanation: {
+                [key: string]: unknown;
+            };
+            /** Id */
+            id: string;
+            /** Impact */
+            impact: {
+                [key: string]: unknown;
+            };
+            /** Not Possible */
+            not_possible: {
+                [key: string]: unknown;
+            }[];
+            /** Options */
+            options: {
+                [key: string]: unknown;
+            }[];
+            /** Project Id */
+            project_id: string;
+            /** Project Name */
+            project_name?: string | null;
+            /**
+             * Proposals
+             * @default []
+             */
+            proposals: string[];
+            /** Recommended */
+            recommended?: string | null;
+            /** Rejected */
+            rejected: {
+                [key: string]: unknown;
+            }[];
+            /** Status */
+            status: string;
+        } & {
+            [key: string]: unknown;
+        };
+        /** RecommendationList */
+        RecommendationList: {
+            /**
+             * Enabled
+             * @description The business rule recovery_enabled
+             */
+            enabled: boolean;
+            /** Recommendations */
+            recommendations: components["schemas"]["RecommendationSummary"][];
+        };
+        /** RecommendationSummary */
+        RecommendationSummary: {
+            /** As Of */
+            as_of?: string | null;
+            /** Calculated */
+            calculated?: string | null;
+            /** Causes */
+            causes: string[];
+            /** Created At */
+            created_at?: string | null;
+            /** Gap Days */
+            gap_days: number;
+            /** Gap Eur */
+            gap_eur: number;
+            /** Headline */
+            headline: string;
+            /** Id */
+            id: string;
+            /** Options */
+            options: number;
+            /** Project Id */
+            project_id: string;
+            /** Project Name */
+            project_name?: string | null;
+            /** Recommended */
+            recommended?: string | null;
+            /** Reported */
+            reported?: string | null;
+            /** Status */
+            status: string;
+            /** Trigger */
+            trigger?: string | null;
+            /** Trigger Label */
+            trigger_label?: string | null;
         };
         /** ReferenceForecast */
         ReferenceForecast: {
@@ -5354,6 +5677,24 @@ export interface components {
             name: string;
             /** Steps */
             steps: number;
+        };
+        /** ScanLog */
+        ScanLog: {
+            /** Chain */
+            chain: {
+                [key: string]: unknown;
+            };
+            /** Scans */
+            scans: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** ScanResult */
+        ScanResult: {
+            /** Enabled */
+            enabled: boolean;
+        } & {
+            [key: string]: unknown;
         };
         /** ScenarioBody */
         ScenarioBody: {
@@ -6596,6 +6937,11 @@ export interface components {
             override?: boolean | null;
             /** Projects */
             projects?: string[] | null;
+            /**
+             * Recommendation Id
+             * @description The red-trigger recommendation the option came from
+             */
+            recommendation_id?: string | null;
             /** Request */
             request?: string | null;
             /** Requester */
@@ -9783,6 +10129,262 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    alerts_api_v1_recovery_alerts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecommendationList"];
+                };
+            };
+        };
+    };
+    analyse_api_v1_recovery_analyse_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnalyseRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Recommendation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    project_recommendations_api_v1_recovery_projects__project_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecommendationList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recommendations_api_v1_recovery_recommendations_get: {
+        parameters: {
+            query?: {
+                status?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecommendationList"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    recommendation_api_v1_recovery_recommendations__rec_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                rec_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Recommendation"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    adopt_api_v1_recovery_recommendations__rec_id__adopt_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                rec_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AdoptRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdoptResult"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    dismiss_api_v1_recovery_recommendations__rec_id__dismiss_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                rec_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DismissRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RecommendationSummary"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    scan_api_v1_recovery_scan_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScanResult"];
+                };
+            };
+        };
+    };
+    scans_api_v1_recovery_scans_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScanLog"];
                 };
             };
         };

@@ -16,6 +16,7 @@ _PMO = (
     ("data_quality", "Data quality", "fact_check", "projects"),
     ("scenarios", "What-if comparison", "compare_arrows", "console"),
     ("insights", "Decision insights", "insights", "overview"),  # status check, probabilities, decision review
+    ("recovery", "Recovery", "healing", "overview"),  # red trigger: recommendations with calculated options
 )
 # a Project Manager works on their own projects, proposals and demands: the titles say so
 _PM = (
@@ -26,6 +27,7 @@ _PM = (
     ("planning", "My demands", "event_note", None),
     ("data_quality", "Data quality", "fact_check", "projects"),
     ("scenarios", "What-if comparison", "compare_arrows", "console"),
+    ("recovery", "Recommendations", "healing", "projects"),  # red trigger: own projects, adopt own-only options
 )
 _BOARD = (("planning", "Planning", "event_note", None),)  # the Portfolio Board reads the plan and approves it
 _ADMIN = (("admin", "Admin Console", "admin_panel_settings", None),)

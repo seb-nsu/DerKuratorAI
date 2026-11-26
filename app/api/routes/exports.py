@@ -17,6 +17,7 @@ from app.core import clock
 from app.core.auth import User
 from app.core.proposals import get_proposal
 from app.core.runtime_config import get_runtime_config
+from app.core.security import ROLE_PMO
 from app.views.exports import build_report_markdown, changes_csv, proposal_message, run_message
 from app.views.steerco_pack import pack_data, render_pack_html
 
@@ -33,7 +34,10 @@ FILE_RESPONSES = {200: {"description": "The export as a download (Content-Dispos
 def _export(kind: str, message: dict, user_message: dict | None, ctx: Scope, requester_id: str | None) -> Response:
     user, environment = ctx.user, get_runtime_config().environment
     if kind == "steerco-pack":
-        data = pack_data(message, requester=requester_id or user.user_id, environment=environment)
+        from app.views.recovery import steerco_rows  # red trigger section: PMO only (the pack goes to the board)
+
+        data = pack_data(message, requester=requester_id or user.user_id, environment=environment,
+                         red_projects=steerco_rows(ctx.full) if user.role == ROLE_PMO else None)
         body = render_pack_html(data)
         audit("steerco_pack_exported", role=user.role, user_id=user.user_id, verdict=data["verdict"])
     elif kind == "markdown":
