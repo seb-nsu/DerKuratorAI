@@ -140,7 +140,11 @@ itself is recorded in the decision log with the pseudonym only.
 
 ## Quickstart
 
-**Requirements:** Python 3.14 (3.12 also works), Windows / macOS / Linux. No database server – the dependency graph is built in memory; Docker is optional (see "Deployment"). Optional: an existing Neo4j 5.21+ as a second graph backend (`GRAPH_BACKEND=neo4j`, see [docs/PILOT_OPERATIONS.md](docs/PILOT_OPERATIONS.md)).
+**Windows, one double-click:** `Start.bat`. The first start creates the Python environment and installs the pinned
+packages, then the browser opens with the demo portfolio; the sign-in page offers the demo accounts with one click.
+No API key is needed (deterministic offline mode). `Start.bat react` (or `start_react.bat`) uses the React front end.
+
+**By hand – requirements:** Python 3.12 or newer (CI runs 3.14), Windows / macOS / Linux. No database server – the dependency graph is built in memory; Docker is optional (see "Deployment"). Optional: an existing Neo4j 5.21+ as a second graph backend (`GRAPH_BACKEND=neo4j`, see [docs/PILOT_OPERATIONS.md](docs/PILOT_OPERATIONS.md)).
 ```powershell
 # 1. Clone and create a virtual environment
 cd derkurator-ai
@@ -171,8 +175,8 @@ built automatically on first access from the bundled test portfolio (`data/DerKu
 $env:FRONTEND = "react"; python scripts/serve.py    # macOS/Linux: FRONTEND=react python scripts/serve.py
 ```
 
-React needs Node.js 22 once to build (`cd frontends/react; npm ci; npm run build`). On Windows the files `Start.bat`
-(NiceGUI), `start_nicegui.bat` and `start_react.bat` in the repository root do all of this and open the browser. The server runs
+React needs Node.js 22 once to build (`cd frontends/react; npm ci; npm run build`). On Windows `Start.bat` (NiceGUI) and
+`Start.bat react` (React; `start_react.bat` does the same) do all of this, including the first setup, and open the browser. The server runs
 in one process; only React may run several workers (`WEB_CONCURRENCY`), with `STATE_STORE=file` and an
 `API_TOKEN_SECRET` (see `docs/API.md`, "Limits"). The container image (`Dockerfile`, `docker-compose.yml`) serves each
 of the two front ends; how to run it and what was verified is in `docs/PILOT_OPERATIONS.md`, "Container". In PROD
